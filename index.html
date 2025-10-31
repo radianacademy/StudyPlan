@@ -439,13 +439,20 @@
             .part-details input {
                 border: none !important;
                 padding: 0 0 2px 0 !important;
-                margin: 0 !important;
+                margin: 0 10px 0 0 !important; /* اضافه کردن فاصله مناسب */
                 background: transparent !important;
                 font-size: 13px !important;
                 font-weight: 600;
                 display: inline-block !important; 
                 width: auto !important;
                 color: #333 !important;
+            }
+
+            /* **ایجاد برچسب‌های فارسی از طریق data-label** */
+            .part-details input::before {
+                content: attr(data-label) " "; /* برچسب از data-label + فاصله */
+                font-weight: 700;
+                color: var(--primary-color);
             }
             
             .part-details {
@@ -526,9 +533,9 @@
             return `
                 <div class="study-part" data-id="${id}">
                     <div class="part-details">
-                        <input type="text" value="${book}" placeholder="نام کتاب">
-                        <input type="text" value="${topic}" placeholder="مبحث/فصل">
-                        <input type="number" value="${tests}" placeholder="تعداد تست" min="0">
+                        <input type="text" value="${book}" placeholder="نام کتاب" data-label="کتاب:"> 
+                        <input type="text" value="${topic}" placeholder="مبحث/فصل" data-label="مبحث:"> 
+                        <input type="number" value="${tests}" placeholder="تعداد تست" min="0" data-label="تست:"> 
                         <button type="button" class="delete-btn" onclick="removeStudyPart(this)">
                             <span class="material-icons" style="font-size: 18px;">delete</span>
                         </button>
