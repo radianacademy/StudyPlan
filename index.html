@@ -233,7 +233,8 @@
             gap: 10px;
         }
         
-        .part-details input {
+        .part-details input, 
+        .part-details select { /* اضافه شدن select */
             flex: 1 1 30%;
             padding: 8px 10px;
             border: 1px solid #ccc;
@@ -241,6 +242,14 @@
             font-family: 'Vazirmatn', sans-serif;
             font-size: 14px;
             min-width: 120px;
+            -webkit-appearance: none; /* برای یکسان‌سازی ظاهر در مرورگرها */
+            -moz-appearance: none;
+            appearance: none;
+            background-color: #fff;
+        }
+
+        .part-details select {
+            flex-basis: 100px; /* فضای کمتر برای select */
         }
         
         .part-details .delete-btn {
@@ -326,7 +335,7 @@
             font-size: 24px;
         }
 
-        /* === سبک‌دهی PDF (فقط برای چاپ) === */
+        /* === سبک‌دهی PDF (فقط برای چاپ) - **بخش اصلاح شده** === */
         @media print {
             body {
                 padding: 0 !important;
@@ -345,16 +354,12 @@
             }
             
             /* پنهان کردن عناصر ناخواسته در چاپ */
-            .initial-fields, .pdf-download-container, .time-period-section button, .study-part .delete-btn {
+            .initial-fields, .pdf-download-container, .time-period-section button, 
+            .study-part .delete-btn, .part-details input, .part-details select { /* پنهان کردن ورودی‌ها */
                 display: none !important; 
             }
-            
-            .header {
-                border-bottom: 2px solid var(--primary-color) !important; /* خط زیر آبی کاربنی */
-                margin-bottom: 15px !important;
-            }
-            
-            /* نمایش اطلاعات اولیه (از فیلدهای مخفی) در PDF - جذاب‌تر */
+
+            /* نمایش اطلاعات اولیه (از فیلدهای مخفی) در PDF */
             .pdf-info {
                 display: flex !important;
                 justify-content: space-around;
@@ -435,39 +440,45 @@
                 background-color: #f7fbff !important; /* پس زمینه روشن آبی برای پارت */
             }
             
-            /* استایل‌دهی فیلدهای ورودی برای چاپ شدن به عنوان متن ساده */
-            .part-details input {
-                border: none !important;
-                padding: 0 0 2px 0 !important;
-                margin: 0 10px 0 0 !important; /* اضافه کردن فاصله مناسب */
-                background: transparent !important;
-                font-size: 13px !important;
-                font-weight: 600;
-                display: inline-block !important; 
-                width: auto !important;
-                color: #333 !important;
-            }
-
-            /* **ایجاد برچسب‌های فارسی از طریق data-label** */
-            .part-details input::before {
-                content: attr(data-label) " "; /* برچسب از data-label + فاصله */
-                font-weight: 700;
-                color: var(--primary-color);
-            }
-            
+            /* استایل‌دهی برای نمایش برچسب‌های چاپی */
             .part-details {
                 display: block !important;
-                line-height: 1.4;
+                line-height: 1.6;
             }
             
-            .part-details div {
-                margin-bottom: 2px;
+            .part-details span.print-label {
+                font-weight: 700;
+                color: var(--primary-color); /* رنگ آبی کاربنی برای برچسب */
+                margin-left: 5px;
+                display: inline-block;
+                min-width: 40px; /* برای یکدست شدن برچسب‌ها */
+            }
+            
+            .part-details span.print-value {
+                font-weight: 500;
+                color: #333;
+                display: inline-block;
+                /* حاشیه پایین برای جدا شدن آیتم‌ها */
+                margin-bottom: 5px; 
+            }
+            
+            .study-part > div {
+                /* برای نمایش آیتم‌های چاپی جدید */
+                display: block !important;
+            }
+
+            .print-content {
+                display: block !important;
+                margin-top: 5px;
             }
         }
         
         /* === استایل برای نمایش اطلاعات در PDF (مخفی در حالت عادی) === */
         .pdf-info {
             display: none; 
+        }
+        .print-content {
+            display: none; /* پنهان کردن محتوای چاپی در مرورگر */
         }
     </style>
 </head>
@@ -527,18 +538,44 @@
             }
         }
         
-        // === تولید HTML پارت مطالعاتی ===
-        function createStudyPartHTML(book = '', topic = '', tests = '') {
+        // === تولید HTML پارت مطالعاتی - **آپدیت شده** ===
+        function createStudyPartHTML(book = '', topic = '', count = '', type = 'test') {
             const id = Date.now() + Math.floor(Math.random() * 1000);
+            const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
+
             return `
                 <div class="study-part" data-id="${id}">
                     <div class="part-details">
-                        <input type="text" value="${book}" placeholder="نام کتاب" data-label="کتاب:"> 
-                        <input type="text" value="${topic}" placeholder="مبحث/فصل" data-label="مبحث:"> 
-                        <input type="number" value="${tests}" placeholder="تعداد تست" min="0" data-label="تست:"> 
+                        
+                        <input type="text" data-type="book" value="${book}" placeholder="نام کتاب">
+                        <input type="text" data-type="topic" value="${topic}" placeholder="مبحث/فصل">
+                        <input type="number" data-type="count" value="${count}" placeholder="تعداد" min="0">
+                        
+                        <select data-type="type" onchange="syncPrintContent(this)">
+                            <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
+                            <option value="descriptive" ${type === 'descriptive' ? 'selected' : ''}>تشریحی</option>
+                        </select>
+                        
                         <button type="button" class="delete-btn" onclick="removeStudyPart(this)">
                             <span class="material-icons" style="font-size: 18px;">delete</span>
                         </button>
+
+                        <div class="print-content">
+                            <div>
+                                <span class="print-label">کتاب:</span> 
+                                <span class="print-value" data-bind="book">${book || '---'}</span>
+                            </div>
+                            <div>
+                                <span class="print-label">مبحث:</span> 
+                                <span class="print-value" data-bind="topic">${topic || '---'}</span>
+                            </div>
+                            <div>
+                                <span class="print-label print-type-label">تست:</span> 
+                                <span class="print-value" data-bind="count">${count || '---'}</span>
+                                (<span class="print-value" data-bind="type">${typeLabel}</span>)
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             `;
@@ -574,7 +611,7 @@
             `;
         }
         
-        // === مدیریت پارت‌های مطالعاتی ===
+        // === مدیریت پارت‌های مطالعاتی و همگام‌سازی - **آپدیت شده** ===
         function addStudyPart(buttonElement) {
             const studyPartsContainer = buttonElement.previousElementSibling;
             studyPartsContainer.insertAdjacentHTML('beforeend', createStudyPartHTML());
@@ -593,6 +630,37 @@
                 section.setAttribute('data-empty', 'true');
             }
         }
+
+        // === همگام سازی مقادیر input/select با محتوای چاپی - **جدید** ===
+        function syncPrintContent(inputElement) {
+            const isSelect = inputElement.tagName === 'SELECT';
+            let value = inputElement.value;
+            const type = inputElement.getAttribute('data-type');
+            
+            if (isSelect) {
+                // اگر select بود، محتوای متنی انتخاب شده را بگیریم
+                value = inputElement.options[inputElement.selectedIndex].text;
+            }
+
+            const displayValue = value || '---';
+            
+            // پیدا کردن عنصر study-part
+            const studyPart = inputElement.closest('.study-part');
+            const printValueElement = studyPart.querySelector(`.print-value[data-bind="${type}"]`);
+            
+            if (printValueElement) {
+                printValueElement.textContent = displayValue;
+            }
+
+            // برای حالت select، برچسب "تست" را نیز آپدیت می‌کنیم (اختیاری)
+            if (isSelect) {
+                 const typeLabel = studyPart.querySelector('.print-type-label');
+                 if (typeLabel) {
+                    typeLabel.textContent = (value === 'تشریحی' ? 'تعداد: ' : 'تست: ');
+                 }
+            }
+        }
+
 
         // === تابع اصلی تولید برنامه هفتگی ===
         function renderWeeklySchedule() {
@@ -642,11 +710,18 @@
         }
 
 
-        // === رویدادها ===
+        // === رویدادها - **آپدیت شده** ===
         document.addEventListener('DOMContentLoaded', () => {
             renderWeeklySchedule();
             
             document.getElementById('downloadPdfBtn').addEventListener('click', prepareForPrint);
+            
+            // افزودن Event Listener برای همگام سازی داده‌های input (کتاب، مبحث، تعداد)
+            document.getElementById('daysContainer').addEventListener('input', (event) => {
+                if (event.target.tagName === 'INPUT') {
+                    syncPrintContent(event.target);
+                }
+            });
         });
 
     </script>
