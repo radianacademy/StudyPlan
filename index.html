@@ -471,6 +471,15 @@
                 display: block !important;
                 margin-top: 5px;
             }
+            
+            /* **استایل جدید برای لیبل نوع/تعداد** */
+             .part-details span.print-type-count-label {
+                font-weight: 700 !important;
+                color: var(--primary-color) !important;
+                margin-left: 5px !important;
+                display: inline-block !important;
+                min-width: 40px !important;
+            }
         }
         
         /* === استایل برای نمایش اطلاعات در PDF (مخفی در حالت عادی) === */
@@ -538,7 +547,7 @@
             }
         }
         
-        // === تولید HTML پارت مطالعاتی - **آپدیت شده** ===
+        // === تولید HTML پارت مطالعاتی - **آپدیت شده برای حذف پرانتز** ===
         function createStudyPartHTML(book = '', topic = '', count = '', type = 'test') {
             const id = Date.now() + Math.floor(Math.random() * 1000);
             const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
@@ -547,9 +556,9 @@
                 <div class="study-part" data-id="${id}">
                     <div class="part-details">
                         
-                        <input type="text" data-type="book" value="${book}" placeholder="نام کتاب">
-                        <input type="text" data-type="topic" value="${topic}" placeholder="مبحث/فصل">
-                        <input type="number" data-type="count" value="${count}" placeholder="تعداد" min="0">
+                        <input type="text" data-type="book" value="${book}" placeholder="نام کتاب" oninput="syncPrintContent(this)">
+                        <input type="text" data-type="topic" value="${topic}" placeholder="مبحث/فصل" oninput="syncPrintContent(this)">
+                        <input type="number" data-type="count" value="${count}" placeholder="تعداد" min="0" oninput="syncPrintContent(this)">
                         
                         <select data-type="type" onchange="syncPrintContent(this)">
                             <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
@@ -570,9 +579,10 @@
                                 <span class="print-value" data-bind="topic">${topic || '---'}</span>
                             </div>
                             <div>
-                                <span class="print-label print-type-label">تست:</span> 
+                                <span class="print-label print-type-count-label">
+                                    ${typeLabel}:
+                                </span> 
                                 <span class="print-value" data-bind="count">${count || '---'}</span>
-                                (<span class="print-value" data-bind="type">${typeLabel}</span>)
                             </div>
                         </div>
 
@@ -611,7 +621,7 @@
             `;
         }
         
-        // === مدیریت پارت‌های مطالعاتی و همگام‌سازی - **آپدیت شده** ===
+        // === مدیریت پارت‌های مطالعاتی و همگام‌سازی ===
         function addStudyPart(buttonElement) {
             const studyPartsContainer = buttonElement.previousElementSibling;
             studyPartsContainer.insertAdjacentHTML('beforeend', createStudyPartHTML());
@@ -631,7 +641,7 @@
             }
         }
 
-        // === همگام سازی مقادیر input/select با محتوای چاپی - **جدید** ===
+        // === همگام سازی مقادیر input/select با محتوای چاپی - **آپدیت شده** ===
         function syncPrintContent(inputElement) {
             const isSelect = inputElement.tagName === 'SELECT';
             let value = inputElement.value;
@@ -652,12 +662,14 @@
                 printValueElement.textContent = displayValue;
             }
 
-            // برای حالت select، برچسب "تست" را نیز آپدیت می‌کنیم (اختیاری)
-            if (isSelect) {
-                 const typeLabel = studyPart.querySelector('.print-type-label');
-                 if (typeLabel) {
-                    typeLabel.textContent = (value === 'تشریحی' ? 'تعداد: ' : 'تست: ');
-                 }
+            // **تغییر: آپدیت لیبل نوع (تست/تشریحی)**
+            if (isSelect || type === 'count') {
+                const typeLabelElement = studyPart.querySelector('.print-type-count-label');
+                const selectElement = studyPart.querySelector('select[data-type="type"]');
+                if (typeLabelElement && selectElement) {
+                    const selectedTypeText = selectElement.options[selectElement.selectedIndex].text;
+                    typeLabelElement.textContent = `${selectedTypeText}:`;
+                }
             }
         }
 
@@ -718,8 +730,9 @@
             
             // افزودن Event Listener برای همگام سازی داده‌های input (کتاب، مبحث، تعداد)
             document.getElementById('daysContainer').addEventListener('input', (event) => {
-                if (event.target.tagName === 'INPUT') {
-                    syncPrintContent(event.target);
+                const target = event.target;
+                if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
+                    syncPrintContent(target);
                 }
             });
         });
