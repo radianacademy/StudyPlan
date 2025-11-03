@@ -8,18 +8,28 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     
     <style>
-        /* === سبک‌دهی عمومی و فونت - هارمونی آبی کاربنی/زنده === */
+        /* === متغیرهای رنگی و اصلی === */
         :root {
-            --primary-color: #1A237E; /* آبی کاربنی تیره */
-            --secondary-color: #2979FF; /* آبی زنده و جذاب (رنگ درخواستی) */
-            --accent-color: #448AFF; /* آبی روشن‌تر برای تاکید */
-            --background-light: #f4f7f9;
-            --card-background: #ffffff;
+            --primary-color: #1a365d;
+            --secondary-color: #2c5282;
+            --accent-color: #3182ce;
+            --light-blue: #e6f2ff;
+            --lighter-blue: #f0f7ff;
+            --success-color: #38a169;
+            --warning-color: #d69e2e;
+            --danger-color: #e53e3e;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-light: #718096;
+            --border-color: #e2e8f0;
+            --background: #f7fafc;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --card-hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
             --border-radius: 12px;
-            --box-shadow-light: 0 4px 10px rgba(0, 0, 0, 0.05);
-            --box-shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
 
+        /* === استایل‌دهی عمومی === */
         * {
             margin: 0;
             padding: 0;
@@ -29,513 +39,1421 @@
 
         body {
             font-family: 'Vazirmatn', sans-serif;
-            background-color: var(--background-light);
-            color: #333;
+            background-color: var(--background);
+            color: var(--text-primary);
             line-height: 1.6;
-            padding: 20px;
             direction: rtl;
+            padding: 20px;
         }
 
-        /* === کانتینر اصلی و ریسپانسیو === */
+        /* === کانتینر اصلی === */
         .app-container {
-            max-width: 1300px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: linear-gradient(135deg, #ffffff 0%, #f7faff 100%);
+            background-color: #ffffff;
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            .app-container {
-                padding: 15px;
-                border-radius: 8px;
-            }
-            .input-group {
-                min-width: 100% !important;
-            }
-        }
-        
-        /* === بخش هدر و لوگو === */
+
+        /* === هدر === */
         .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 30px 20px;
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #eee;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none"/><path d="M0,0 L100,100 M100,0 L0,100" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>');
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
         }
 
         .logo-container {
             margin-bottom: 15px;
+            display: inline-block;
+            background-color: white;
+            padding: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .logo {
             max-width: 150px;
             height: auto;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: block;
         }
 
         .title {
             font-size: 32px;
             font-weight: 800;
-            color: var(--primary-color);
             margin-bottom: 5px;
             letter-spacing: 1px;
         }
 
         .subtitle {
             font-size: 18px;
-            color: var(--secondary-color);
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        /* === بخش شخصی‌سازی مشاوران === */
+        .counselor-customization {
+            background-color: var(--lighter-blue);
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .counselor-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .counselor-trigger {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background-color: white;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .counselor-trigger:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+
+        .counselor-trigger.active {
+            border-color: var(--accent-color);
+            background-color: var(--light-blue);
+        }
+
+        .counselor-trigger-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .counselor-trigger.active .counselor-trigger-icon {
+            background-color: var(--success-color);
+        }
+
+        .counselor-trigger-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .counselor-trigger-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        .counselor-trigger-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .counselor-trigger-badge {
+            background-color: var(--success-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: 500;
         }
-        
-        /* === فرم ورودی‌های اولیه === */
-        .initial-fields {
-            display: flex;
-            flex-wrap: wrap;
+
+        .counselor-trigger-badge.special {
+            background-color: var(--warning-color);
+        }
+
+        /* === بخش اطلاعات اصلی === */
+        .info-section {
+            padding: 30px;
+            background-color: var(--lighter-blue);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #e3f2fd; /* سایه روشن آبی جدید */
+        }
+
+        .info-card {
+            background-color: white;
             border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-light);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .info-card-title .material-icons {
+            margin-left: 8px;
+            color: var(--accent-color);
         }
 
         .input-group {
-            flex: 1 1 30%; 
-            min-width: 250px;
+            margin-bottom: 15px;
         }
-        
+
         .input-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary-color);
+            font-weight: 500;
+            color: var(--text-secondary);
             font-size: 14px;
         }
 
-        .input-group input {
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid #ccc;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-family: 'Vazirmatn', sans-serif;
             font-size: 16px;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: var(--transition);
         }
 
-        .input-group input:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(41, 121, 255, 0.2);
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
             outline: none;
         }
-        
-        /* === کانتینر روزها === */
-        .days-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
         }
 
-        /* === کارت هر روز === */
-        .day-card {
-            background-color: var(--card-background);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow-light);
-            padding: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
+        /* === بخش ابزارها === */
+        .tools-section {
+            padding: 20px 30px;
+            background-color: white;
             display: flex;
-            flex-direction: column;
-            min-height: 400px;
-            border: 1px solid #eee;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-blue);
+            color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--lighter-blue);
+        }
+
+        .btn .material-icons {
+            margin-left: 8px;
+        }
+
+        /* === بخش برنامه هفتگی === */
+        .schedule-section {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title .material-icons {
+            margin-left: 10px;
+            color: var(--accent-color);
+        }
+
+        .days-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .day-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: var(--transition);
         }
 
         .day-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--box-shadow-hover);
+            box-shadow: var(--card-hover-shadow);
         }
 
         .day-header {
-            font-size: 24px;
-            font-weight: 700;
-            text-align: center;
-            padding: 10px;
-            margin: -20px -20px 20px -20px;
-            border-top-left-radius: var(--border-radius);
-            border-top-right-radius: var(--border-radius);
+            padding: 15px;
             color: white;
-            letter-spacing: 1px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        /* رنگ‌بندی روزها با هارمونی آبی */
-        .day-card[data-day="شنبه"] .day-header { background-color: #2979FF; } 
-        .day-card[data-day="یکشنبه"] .day-header { background-color: #1E88E5; }
-        .day-card[data-day="دوشنبه"] .day-header { background-color: #1565C0; }
-        .day-card[data-day="سه‌شنبه"] .day-header { background-color: #0D47A1; }
-        .day-card[data-day="چهارشنبه"] .day-header { background-color: #3F51B5; }
-        .day-card[data-day="پنج‌شنبه"] .day-header { background-color: #303F9F; }
-        .day-card[data-day="جمعه"] .day-header { background-color: #1A237E; } /* تیره ترین برای روز استراحت/مرور */
-
-        /* === بلوک زمانی (صبح، ظهر، شب) === */
-        .time-period-section {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px dashed var(--secondary-color); /* تغییر به آبی */
-            background-color: #f7fbff; /* پس زمینه بسیار روشن */
-        }
-        
-        .time-period-header {
             font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            position: relative;
+        }
+
+        .day-header .delete-btn {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .day-header .delete-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .day-body {
+            padding: 20px;
+        }
+
+        .time-period {
+            margin-bottom: 20px;
+        }
+
+        .time-period:last-child {
+            margin-bottom: 0;
+        }
+
+        .time-period-title {
+            font-size: 16px;
             font-weight: 600;
             color: var(--primary-color);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
         }
-        
-        .time-period-header .material-icons {
-            margin-left: 5px;
-            color: var(--secondary-color); /* تغییر به آبی */
+
+        .time-period-title .material-icons {
+            margin-left: 8px;
+            color: var(--accent-color);
             font-size: 20px;
         }
-        
+
         .study-parts {
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
 
-        /* === پارت مطالعاتی === */
         .study-part {
-            background-color: #e3f2fd; /* سایه روشن آبی جدید */
+            background-color: var(--lighter-blue);
             border-radius: 8px;
-            padding: 12px;
-            border-right: 5px solid var(--secondary-color); /* تغییر به آبی زنده */
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .study-part:hover {
-            background-color: #bbdefb; /* روشن‌تر هنگام هاور */
+            padding: 15px;
+            border-right: 4px solid var(--accent-color);
         }
 
-        .part-details {
+        .study-part-header {
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .study-part-title {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .study-part-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+            z-index: 10;
+        }
+
+        .icon-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--danger-color);
+        }
+
+        .study-part-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px;
         }
-        
-        .part-details input, 
-        .part-details select { /* اضافه شدن select */
-            flex: 1 1 30%;
-            padding: 8px 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-family: 'Vazirmatn', sans-serif;
-            font-size: 14px;
-            min-width: 120px;
-            -webkit-appearance: none; /* برای یکسان‌سازی ظاهر در مرورگرها */
-            -moz-appearance: none;
-            appearance: none;
-            background-color: #fff;
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
         }
 
-        .part-details select {
-            flex-basis: 100px; /* فضای کمتر برای select */
-        }
-        
-        .part-details .delete-btn {
-            background-color: #D32F2F; /* رنگ ثابت برای دکمه حذف */
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+        .detail-label {
             font-size: 12px;
-            flex-basis: 40px;
-            flex-grow: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--text-light);
+            margin-bottom: 5px;
         }
 
-        .part-details .delete-btn:hover {
-            background-color: #C62828;
-        }
-        
-        /* === دکمه افزودن پارت === */
-        .add-part-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-family: 'Vazirmatn', sans-serif;
+        .detail-value {
             font-size: 14px;
-            margin-top: 10px;
-            width: 100%;
-            transition: background-color 0.3s, transform 0.2s;
+            color: var(--text-primary);
+        }
+
+        .day-notes {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+        }
+
+        .day-notes-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
             display: flex;
+            align-items: center;
+        }
+
+        .day-notes-title .material-icons {
+            margin-left: 5px;
+            font-size: 18px;
+            color: var(--accent-color);
+        }
+
+        .day-notes-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            background-color: var(--lighter-blue);
+            padding: 10px;
+            border-radius: 6px;
+            min-height: 60px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            font-family: 'Vazirmatn', sans-serif;
+            resize: vertical;
+        }
+
+        .day-notes-content:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        /* === بخش روتین شبانه === */
+        .night-routine-section {
+            padding: 30px;
+            background-color: var(--lighter-blue);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .routine-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .routine-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .routine-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .routine-item .material-icons {
+            color: var(--accent-color);
+            margin-top: 2px;
+            font-size: 20px;
+        }
+
+        .routine-text {
+            flex: 1;
+        }
+
+        /* === بخش خروجی HTML === */
+        .html-section {
+            padding: 30px;
+            text-align: center;
+            background-color: white;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .html-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* === مودال === */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             align-items: center;
             justify-content: center;
         }
 
-        .add-part-btn:hover {
-            background-color: var(--primary-color);
-            transform: translateY(-2px);
-        }
-        
-        .add-part-btn .material-icons {
-            font-size: 18px;
-            margin-left: 5px;
-        }
-        
-        /* === دکمه دانلود PDF === */
-        .pdf-download-container {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #eee;
+        .modal.active {
+            display: flex;
         }
 
-        .download-btn {
-            background-color: var(--secondary-color); /* تغییر به آبی زنده */
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
             font-size: 20px;
             font-weight: 600;
-            font-family: 'Vazirmatn', sans-serif; /* **اضافه شدن فونت** */
-            transition: background-color 0.3s, transform 0.2s;
-            box-shadow: 0 4px 15px rgba(41, 121, 255, 0.4); /* سایه آبی */
-            display: inline-flex;
+            color: var(--primary-color);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+            position: relative;
+            z-index: 10;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            background-color: var(--lighter-blue);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            z-index: 10;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-color);
+            background-color: var(--light-blue);
+        }
+
+        .upload-area .material-icons {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        /* === پیش‌نمایش === */
+        .preview-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .preview-container.active {
+            display: flex;
+        }
+
+        .preview-content {
+            background-color: white;
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
         }
 
-        .download-btn:hover {
-            background-color: #1E88E5; /* سایه کمی تیره‌تر از آبی زنده */
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(41, 121, 255, 0.6);
+        .preview-body {
+            padding: 20px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
         }
 
-        .download-btn .material-icons {
-            margin-left: 10px;
+        .preview-close {
+            background: none;
+            border: none;
+            color: white;
             font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
         }
 
-        /* === سبک‌دهی PDF (فقط برای چاپ) - **بخش اصلاح شده** === */
-        @media print {
+        /* === استایل‌های ریسپانسیو === */
+        @media (max-width: 768px) {
             body {
-                padding: 0 !important;
-                background-color: white !important;
-                direction: rtl !important;
-            }
-            .app-container {
-                max-width: none !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                padding: 10mm !important;
-                min-height: 297mm; 
-                width: 210mm;
-                margin: 0 auto;
-                background: white !important;
-            }
-            
-            /* پنهان کردن عناصر ناخواسته در چاپ */
-            .initial-fields, .pdf-download-container, .time-period-section button, 
-            .study-part .delete-btn, .part-details input, .part-details select { /* پنهان کردن ورودی‌ها */
-                display: none !important; 
+                padding: 10px;
             }
 
-            /* نمایش اطلاعات اولیه (از فیلدهای مخفی) در PDF */
-            .pdf-info {
-                display: flex !important;
-                justify-content: space-around;
-                margin-bottom: 20px;
-                font-size: 14px;
-                padding: 12px;
-                border: 2px solid var(--secondary-color); /* کادر آبی زنده */
-                border-radius: 8px;
-                background-color: #e3f2fd; /* پس زمینه روشن آبی */
+            .title {
+                font-size: 24px;
             }
-            .pdf-info div {
-                font-weight: 500;
-                color: #333;
-                border-left: 1px solid #c8e6c9;
-                padding-left: 15px;
+
+            .subtitle {
+                font-size: 16px;
             }
-            .pdf-info div:last-child {
-                border-left: none;
-                padding-left: 0;
+
+            .info-section,
+            .schedule-section,
+            .night-routine-section,
+            .html-section {
+                padding: 20px;
             }
-            .pdf-info b {
-                font-weight: 700;
-                color: var(--primary-color); /* نام آیتم به آبی کاربنی */
-                margin-left: 5px;
-            }
-            
+
             .days-container {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 10px !important;
-                page-break-inside: avoid;
-            }
-            .day-card {
-                width: calc(33.333% - 10px) !important;
-                box-shadow: none !important;
-                border: 1px solid #ccc !important;
-                padding: 10px !important;
-                min-height: 250px !important;
-                break-inside: avoid;
-                transition: none; 
-            }
-            .day-card:hover {
-                transform: none;
-                box-shadow: none;
-            }
-            .day-header {
-                font-size: 18px !important;
-                margin: -10px -10px 15px -10px !important;
-            }
-            
-            .time-period-section {
-                border: none !important;
-                padding: 0 !important;
-                background-color: transparent !important;
-            }
-            
-            /* پنهان کردن بلوک‌های زمانی خالی در حالت چاپ */
-            .time-period-section[data-empty="true"] {
-                display: none !important;
+                grid-template-columns: 1fr;
             }
 
-            .time-period-header {
-                font-size: 16px !important;
-                color: var(--primary-color) !important; /* سرتیتر به رنگ کاربنی */
-                border-bottom: 1px solid var(--secondary-color); /* خط زیر آبی زنده */
-                padding-bottom: 5px;
-                margin-bottom: 5px !important;
-            }
-            .time-period-header .material-icons {
-                display: none;
-            }
-            
-            .study-part {
-                margin-bottom: 5px;
-                padding: 8px !important;
-                font-size: 13px !important;
-                border-right: 5px solid #2979FF !important; /* آبی زنده برای نوار کناری */
-                background-color: #f7fbff !important; /* پس زمینه روشن آبی برای پارت */
-            }
-            
-            /* استایل‌دهی برای نمایش برچسب‌های چاپی */
-            .part-details {
-                display: block !important;
-                line-height: 1.6;
-            }
-            
-            .part-details span.print-label {
-                font-weight: 700;
-                color: var(--primary-color); /* رنگ آبی کاربنی برای برچسب */
-                margin-left: 5px;
-                display: inline-block;
-                min-width: 40px; /* برای یکدست شدن برچسب‌ها */
-            }
-            
-            .part-details span.print-value {
-                font-weight: 500;
-                color: #333;
-                display: inline-block;
-                /* حاشیه پایین برای جدا شدن آیتم‌ها */
-                margin-bottom: 5px; 
-            }
-            
-            .study-part > div {
-                /* برای نمایش آیتم‌های چاپی جدید */
-                display: block !important;
+            .tools-section {
+                flex-direction: column;
+                align-items: stretch;
             }
 
-            .print-content {
-                display: block !important;
-                margin-top: 5px;
-            }
-            
-            /* **استایل جدید برای لیبل نوع/تعداد** */
-             .part-details span.print-type-count-label {
-                font-weight: 700 !important;
-                color: var(--primary-color) !important;
-                margin-left: 5px !important;
-                display: inline-block !important;
-                min-width: 40px !important;
+            .html-actions {
+                flex-direction: column;
             }
         }
-        
-        /* === استایل برای نمایش اطلاعات در PDF (مخفی در حالت عادی) === */
-        .pdf-info {
-            display: none; 
+
+        /* === استایل‌های اعلان === */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
-        .print-content {
-            display: none; /* پنهان کردن محتوای چاپی در مرورگر */
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--success-color);
+        }
+
+        .toast.error {
+            background-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            background-color: var(--warning-color);
+        }
+
+        /* === استایل‌های مخفی برای محتوای HTML === */
+        .html-content {
+            display: none;
+        }
+
+        /* === استایل‌های دیالوگ نام‌گذاری === */
+        .file-name-dialog {
+            text-align: center;
+        }
+
+        .file-name-dialog .material-icons {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .file-name-dialog h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .file-name-dialog p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .file-name-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .file-name-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        .dialog-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .dialog-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .dialog-btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .dialog-btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .dialog-btn-secondary {
+            background-color: var(--light-blue);
+            color: var(--primary-color);
+        }
+
+        .dialog-btn-secondary:hover {
+            background-color: var(--lighter-blue);
+        }
+
+        /* === استایل‌های فیلدهای داخل پارت مطالعاتی === */
+        .study-part-details input,
+        .study-part-details select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .study-part-details input:focus,
+        .study-part-details select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        /* === استایل‌های فیلدهای روتین شبانه === */
+        .routine-item input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .routine-item input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        /* === استایل‌های دیالوگ انتخاب کاستوم === */
+        .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-trigger {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            background-color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .custom-select-trigger:hover {
+            border-color: var(--accent-color);
+        }
+
+        .custom-select-trigger:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        .custom-select-trigger .material-icons {
+            color: var(--text-light);
+            font-size: 20px;
+        }
+
+        .custom-options {
+            position: absolute;
+            display: none;
+            top: calc(100% + 5px);
+            left: 0;
+            right: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--card-hover-shadow);
+            z-index: 100;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .custom-options.active {
+            display: block;
+        }
+
+        .custom-option {
+            padding: 12px 15px;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-option:hover {
+            background-color: var(--lighter-blue);
+        }
+
+        .custom-option.selected {
+            background-color: var(--light-blue);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* استایل برای اسپینر اصلی مخفی */
+        .original-select {
+            display: none;
+        }
+
+        /* Fix for custom select size in study parts */
+        .study-part-details .custom-select-trigger {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .study-part-details .custom-select-trigger .material-icons {
+            font-size: 18px;
+        }
+
+        /* === استایل‌های دیالوگ افزودن کتاب === */
+        .add-book-dialog {
+            text-align: center;
+        }
+
+        .add-book-dialog .material-icons {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .add-book-dialog h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .add-book-dialog p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .book-name-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .book-name-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+            outline: none;
+        }
+
+        /* === استایل‌های دیالوگ انتخاب شخصی‌سازی === */
+        .customization-dialog {
+            text-align: center;
+        }
+
+        .customization-dialog .material-icons {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .customization-dialog h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .customization-dialog p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .customization-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .customization-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .customization-option:hover {
+            border-color: var(--accent-color);
+            background-color: var(--lighter-blue);
+        }
+
+        .customization-option.selected {
+            border-color: var(--accent-color);
+            background-color: var(--light-blue);
+        }
+
+        .customization-option-info {
+            flex: 1;
+            text-align: right;
+        }
+
+        .customization-option-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+
+        .customization-option-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .customization-option-badge {
+            background-color: var(--success-color);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .customization-option-badge.special {
+            background-color: var(--warning-color);
         }
     </style>
 </head>
 <body>
     <div class="app-container" id="appContainer">
-        
-        <div class="header">
-            <div class="logo-container">
-                <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="logo">
+        <!-- هدر -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="logo">
+                </div>
+                <h1 class="title">برنامه هفتگی مطالعه</h1>
+                <p class="subtitle">طراحی شده توسط آکادمی تحصیلی رادیان</p>
             </div>
-            <h1 class="title">برنامه ریزی هفتگی مطالعه</h1>
-            <p class="subtitle">طراحی شده توسط آکادمی تحصیلی رادیان</p>
-        </div>
+        </header>
 
-        <div class="initial-fields">
-            <div class="input-group">
-                <label for="counselorName">نام مشاور:</label>
-                <input type="text" id="counselorName" placeholder="نام مشاور خود را وارد کنید" value="">
+        <!-- بخش شخصی‌سازی مشاوران -->
+        <section class="counselor-customization">
+            <div class="counselor-selector">
+                <div class="counselor-trigger active" id="counselorTrigger">
+                    <div class="counselor-trigger-icon">
+                        <span class="material-icons">schedule</span>
+                    </div>
+                    <div class="counselor-trigger-info">
+                        <div class="counselor-trigger-name" id="currentCounselorName">حالت استاندارد</div>
+                        <div class="counselor-trigger-type">برنامه هفتگی بر اساس روزها</div>
+                    </div>
+                    <span class="counselor-trigger-badge">فعال</span>
+                </div>
             </div>
-            <div class="input-group">
-                <label for="studentName">نام دانش آموز:</label>
-                <input type="text" id="studentName" placeholder="نام دانش آموز را وارد کنید" value="">
-            </div>
-            <div class="input-group">
-                <label for="reportDate">تاریخ گزارش (شمسی):</label>
-                <input type="text" id="reportDate" placeholder="تاریخ امروز" dir="ltr">
-            </div>
-        </div>
+        </section>
 
-        <div class="pdf-info" id="pdfInfo">
-            </div>
+        <!-- بخش اطلاعات اصلی -->
+        <section class="info-section">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <span class="material-icons">person</span>
+                        <span>اطلاعات مشاور</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="counselorName">نام مشاور</label>
+                        <input type="text" id="counselorName" placeholder="نام مشاور را وارد کنید">
+                    </div>
+                    <div class="input-group">
+                        <label for="counselorContact">شماره تماس</label>
+                        <input type="text" id="counselorContact" placeholder="شماره تماس مشاور">
+                    </div>
+                </div>
 
-        <div class="days-container" id="daysContainer">
-            </div>
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <span class="material-icons">school</span>
+                        <span>اطلاعات دانش‌آموز</span>
+                    </div>
+                    <div class="input-group">
+                        <label for="studentName">نام دانش‌آموز</label>
+                        <input type="text" id="studentName" placeholder="نام دانش‌آموز را وارد کنید">
+                    </div>
+                    <div class="input-group">
+                        <label for="studentGrade">پایه تحصیلی</label>
+                        <div class="custom-select">
+                            <select id="studentGrade" class="original-select">
+                                <option value="">پایه را انتخاب کنید</option>
+                                <option value="هفتم">هفتم</option>
+                                <option value="هشتم">هشتم</option>
+                                <option value="نهم">نهم</option>
+                                <option value="دهم">دهم</option>
+                                <option value="یازدهم">یازدهم</option>
+                                <option value="دوازدهم">دوازدهم</option>
+                            </select>
+                            <div class="custom-select-trigger">
+                                <span>پایه را انتخاب کنید</span>
+                                <span class="material-icons">keyboard_arrow_down</span>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" data-value="">پایه را انتخاب کنید</div>
+                                <div class="custom-option" data-value="هفتم">هفتم</div>
+                                <div class="custom-option" data-value="هشتم">هشتم</div>
+                                <div class="custom-option" data-value="نهم">نهم</div>
+                                <div class="custom-option" data-value="دهم">دهم</div>
+                                <div class="custom-option" data-value="یازدهم">یازدهم</div>
+                                <div class="custom-option" data-value="دوازدهم">دوازدهم</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group" id="studentFieldGroup">
+                        <label for="studentField">رشته تحصیلی</label>
+                        <div class="custom-select">
+                            <select id="studentField" class="original-select">
+                                <option value="">رشته را انتخاب کنید</option>
+                                <option value="تجربی">علوم تجربی</option>
+                                <option value="ریاضی">ریاضی و فیزیک</option>
+                                <option value="انسانی">علوم انسانی</option>
+                                <option value="فنی">فنی و حرفه‌ای</option>
+                                <option value="هنر">هنر</option>
+                            </select>
+                            <div class="custom-select-trigger">
+                                <span>رشته را انتخاب کنید</span>
+                                <span class="material-icons">keyboard_arrow_down</span>
+                            </div>
+                            <div class="custom-options">
+                                <div class="custom-option" data-value="">رشته را انتخاب کنید</div>
+                                <div class="custom-option" data-value="تجربی">علوم تجربی</div>
+                                <div class="custom-option" data-value="ریاضی">ریاضی و فیزیک</div>
+                                <div class="custom-option" data-value="انسانی">علوم انسانی</div>
+                                <div class="custom-option" data-value="فنی">فنی و حرفه‌ای</div>
+                                <div class="custom-option" data-value="هنر">هنر</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="pdf-download-container">
-            <button class="download-btn" id="downloadPdfBtn">
-                <span class="material-icons">download</span>
-                دانلود برنامه به صورت PDF
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <span class="material-icons">calendar_today</span>
+                        <span>اطلاعات برنامه</span>
+                    </div>
+                    <div class="input-group" id="weekNumberGroup">
+                        <label for="weekNumber">شماره هفته</label>
+                        <input type="number" id="weekNumber" placeholder="مثلاً: ۱" min="1">
+                    </div>
+                    <div class="input-group" id="dateRangeGroup" style="display: none;">
+                        <label for="dateRange">بازه زمانی</label>
+                        <input type="text" id="dateRange" placeholder="مثلاً: از امروز تا نهم">
+                    </div>
+                    <div class="input-group">
+                        <label for="reportDate">تاریخ برنامه‌ریزی</label>
+                        <input type="text" id="reportDate" placeholder="تاریخ امروز" dir="ltr" readonly>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- بخش ابزارها -->
+        <section class="tools-section">
+            <button class="btn btn-secondary" id="importHtmlBtn">
+                <span class="material-icons">upload_file</span>
+                وارد کردن برنامه قبلی
             </button>
+        </section>
+
+        <!-- بخش برنامه هفتگی -->
+        <section class="schedule-section">
+            <h2 class="section-title" id="scheduleTitle">
+                <span class="material-icons">view_week</span>
+                برنامه هفتگی مطالعه
+            </h2>
+            <div class="days-container" id="daysContainer">
+                <!-- روزهای هفته در اینجا با جاوااسکریپت اضافه می‌شوند -->
+            </div>
+        </section>
+
+        <!-- بخش روتین شبانه -->
+        <section class="night-routine-section">
+            <h2 class="section-title">
+                <span class="material-icons">nights_stay</span>
+                روتین شبانه
+            </h2>
+            <div class="routine-card">
+                <div class="input-group">
+                    <label for="routineDescription">توضیحات کلی روتین شبانه</label>
+                    <textarea id="routineDescription" placeholder="توضیحات کلی در مورد روتین شبانه دانش‌آموز..."></textarea>
+                </div>
+                <div class="routine-items">
+                    <div class="routine-item">
+                        <span class="material-icons">bedtime</span>
+                        <div class="routine-text">
+                            <div class="detail-label">زمان خواب</div>
+                            <div class="detail-value">
+                                <input type="text" id="sleepTime" placeholder="مثلاً: ۲۳:۰۰">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="routine-item">
+                        <span class="material-icons">wb_sunny</span>
+                        <div class="routine-text">
+                            <div class="detail-label">زمان بیداری</div>
+                            <div class="detail-value">
+                                <input type="text" id="wakeTime" placeholder="مثلاً: ۰۶:۳۰">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- بخش خروجی HTML -->
+        <section class="html-section">
+            <h2 class="section-title">
+                <span class="material-icons">code</span>
+                خروجی برنامه
+            </h2>
+            <div class="html-actions">
+                <button class="btn btn-primary" id="downloadHtmlBtn">
+                    <span class="material-icons">download</span>
+                    دانلود برنامه به صورت HTML
+                </button>
+                <button class="btn btn-secondary" id="previewBtn">
+                    <span class="material-icons">visibility</span>
+                    پیش‌نمایش
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- مودال افزودن کتاب -->
+    <div class="modal" id="addBookModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">افزودن کتاب جدید</h3>
+                <button class="modal-close" id="closeAddBookModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="add-book-dialog">
+                    <span class="material-icons">menu_book</span>
+                    <h3>نام کتاب را وارد کنید</h3>
+                    <p>لطفاً نام کتاب مورد نظر خود را وارد نمایید</p>
+                    <input type="text" class="book-name-input" id="bookNameInput" placeholder="نام کتاب">
+                    <div class="dialog-actions">
+                        <button class="dialog-btn dialog-btn-primary" id="confirmAddBook">تایید</button>
+                        <button class="dialog-btn dialog-btn-secondary" id="cancelAddBook">انصراف</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <!-- مودال وارد کردن HTML -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">وارد کردن برنامه قبلی</h3>
+                <button class="modal-close" id="closeImportModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea">
+                    <span class="material-icons">cloud_upload</span>
+                    <p class="upload-text">فایل HTML برنامه قبلی را اینجا بکشید یا کلیک کنید</p>
+                    <p class="upload-hint">فقط فایل‌های HTML با حداکثر حجم ۵ مگابایت مجاز هستند</p>
+                    <input type="file" id="fileInput" accept=".html,.htm" style="display: none;">
+                </div>
+                <div id="uploadResult" style="margin-top: 15px; display: none;">
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <span class="material-icons">check_circle</span>
+                            <span>فایل با موفقیت بارگذاری شد</span>
+                        </div>
+                        <div id="fileInfo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- دیالوگ نام‌گذاری فایل -->
+    <div class="modal" id="fileNameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">نام‌گذاری فایل</h3>
+                <button class="modal-close" id="closeFileNameModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="file-name-dialog">
+                    <span class="material-icons">drive_file_rename_outline</span>
+                    <h3>نام فایل را وارد کنید</h3>
+                    <p>لطفاً نام دلخواه خود را برای فایل وارد نمایید</p>
+                    <input type="text" class="file-name-input" id="fileNameInput" placeholder="نام فایل">
+                    <div class="dialog-actions">
+                        <button class="dialog-btn dialog-btn-primary" id="confirmFileName">تایید</button>
+                        <button class="dialog-btn dialog-btn-secondary" id="cancelFileName">انصراف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- دیالوگ انتخاب شخصی‌سازی -->
+    <div class="modal" id="customizationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">شخصی‌سازی برنامه</h3>
+                <button class="modal-close" id="closeCustomizationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="customization-dialog">
+                    <span class="material-icons">settings</span>
+                    <h3>نوع برنامه را انتخاب کنید</h3>
+                    <p>لطفاً نوع برنامه مورد نظر خود را انتخاب نمایید</p>
+                    <div class="customization-options">
+                        <div class="customization-option selected" data-counselor="standard">
+                            <div class="customization-option-info">
+                                <div class="customization-option-name">حالت استاندارد</div>
+                                <div class="customization-option-type">برنامه هفتگی بر اساس روزها</div>
+                            </div>
+                            <span class="customization-option-badge">فعال</span>
+                        </div>
+                        <div class="customization-option" data-counselor="alireza-torkamani">
+                            <div class="customization-option-info">
+                                <div class="customization-option-name">علیرضا ترکمانی</div>
+                                <div class="customization-option-type">برنامه بر اساس کتاب‌ها</div>
+                            </div>
+                            <span class="customization-option-badge special">ویژه</span>
+                        </div>
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="dialog-btn dialog-btn-primary" id="confirmCustomization">تایید</button>
+                        <button class="dialog-btn dialog-btn-secondary" id="cancelCustomization">انصراف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- پیش‌نمایش -->
+    <div class="preview-container" id="previewContainer">
+        <div class="preview-content">
+            <div class="preview-header">
+                <h3>پیش‌نمایش برنامه هفتگی</h3>
+                <button class="preview-close" id="closePreview">&times;</button>
+            </div>
+            <div class="preview-body" id="previewBody">
+                <!-- محتوای پیش‌نمایش در اینجا قرار می‌گیرد -->
+            </div>
+        </div>
+    </div>
+
+    <!-- اعلان -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        // === توابع کمکی تاریخ (شمسی عددی) ===
-        function getPersianDateNumeric() {
+        // === متغیرهای سراسری ===
+        let currentFileNameCallback = null;
+        let currentCounselorType = 'standard'; // 'standard' یا 'alireza-torkamani'
+
+        // === توابع کمکی ===
+        function getPersianDate() {
             try {
-                // دریافت تاریخ شمسی به صورت عددی (مثلاً ۱۴۰۲/۰۷/۰۵)
                 return new Intl.DateTimeFormat('fa-IR', {
                     year: 'numeric',
                     month: '2-digit',
@@ -546,197 +1464,1797 @@
                 return new Date().toLocaleDateString('fa-IR');
             }
         }
-        
-        // === تولید HTML پارت مطالعاتی - **آپدیت شده برای حذف پرانتز** ===
+
+        // === نمایش اعلان ===
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // === تولید HTML برای روز هفته (حالت استاندارد) ===
+        function createDayCardHTML(dayName, dayIndex) {
+            const dayColors = [
+                '#1a365d', // شنبه
+                '#2c5282', // یکشنبه
+                '#3182ce', // دوشنبه
+                '#2b6cb0', // سه‌شنبه
+                '#2c5282', // چهارشنبه
+                '#2a4e7c', // پنج‌شنبه
+                '#1a365d'  // جمعه
+            ];
+
+            return `
+                <div class="day-card" data-day="${dayName}">
+                    <div class="day-header" style="background-color: ${dayColors[dayIndex]};">
+                        ${dayName}
+                    </div>
+                    <div class="day-body">
+                        <div class="time-period">
+                            <div class="time-period-title">
+                                <span class="material-icons">wb_sunny</span>
+                                <span>صبحگاهی</span>
+                            </div>
+                            <div class="study-parts" data-period="morning">
+                                <!-- پارت‌های مطالعاتی صبح در اینجا اضافه می‌شوند -->
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="addStudyPart('${dayName}', 'morning')">
+                                <span class="material-icons">add</span>
+                                افزودن پارت مطالعاتی
+                            </button>
+                        </div>
+                        
+                        <div class="time-period">
+                            <div class="time-period-title">
+                                <span class="material-icons">wb_twighlight</span>
+                                <span>بعد از ظهر</span>
+                            </div>
+                            <div class="study-parts" data-period="afternoon">
+                                <!-- پارت‌های مطالعاتی بعد از ظهر در اینجا اضافه می‌شوند -->
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="addStudyPart('${dayName}', 'afternoon')">
+                                <span class="material-icons">add</span>
+                                افزودن پارت مطالعاتی
+                            </button>
+                        </div>
+                        
+                        <div class="time-period">
+                            <div class="time-period-title">
+                                <span class="material-icons">nights_stay</span>
+                                <span>شبانه</span>
+                            </div>
+                            <div class="study-parts" data-period="evening">
+                                <!-- پارت‌های مطالعاتی شب در اینجا اضافه می‌شوند -->
+                            </div>
+                            <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="addStudyPart('${dayName}', 'evening')">
+                                <span class="material-icons">add</span>
+                                افزودن پارت مطالعاتی
+                            </button>
+                        </div>
+                        
+                        <div class="day-notes">
+                            <div class="day-notes-title">
+                                <span class="material-icons">note</span>
+                                <span>توضیحات روز</span>
+                            </div>
+                            <textarea class="day-notes-content" placeholder="توضیحات مربوط به ${dayName} را در اینجا وارد کنید..." data-day="${dayName}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // === تولید HTML برای کتاب (حالت علیرضا ترکمانی) ===
+        function createBookCardHTML(bookName, bookIndex) {
+            const bookColors = [
+                '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
+            ];
+            const colorIndex = bookIndex % bookColors.length;
+
+            return `
+                <div class="day-card" data-book="${bookName}">
+                    <div class="day-header" style="background-color: ${bookColors[colorIndex]};">
+                        <button class="delete-btn" onclick="deleteBook('${bookName}')">
+                            <span class="material-icons">delete</span>
+                        </button>
+                        ${bookName}
+                    </div>
+                    <div class="day-body">
+                        <div class="study-parts" data-book="${bookName}">
+                            <!-- پارت‌های مطالعاتی کتاب در اینجا اضافه می‌شوند -->
+                        </div>
+                        <button class="btn btn-secondary" style="margin-top: 10px; width: 100%;" onclick="addBookPart('${bookName}')">
+                            <span class="material-icons">add</span>
+                            افزودن مبحث مطالعاتی
+                        </button>
+                        
+                        <div class="day-notes">
+                            <div class="day-notes-title">
+                                <span class="material-icons">note</span>
+                                <span>توضیحات کتاب</span>
+                            </div>
+                            <textarea class="day-notes-content" placeholder="توضیحات مربوط به کتاب ${bookName} را در اینجا وارد کنید..." data-book="${bookName}"></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // === تولید HTML برای پارت مطالعاتی ===
         function createStudyPartHTML(book = '', topic = '', count = '', type = 'test') {
             const id = Date.now() + Math.floor(Math.random() * 1000);
             const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
 
             return `
                 <div class="study-part" data-id="${id}">
-                    <div class="part-details">
-                        
-                        <input type="text" data-type="book" value="${book}" placeholder="نام کتاب" oninput="syncPrintContent(this)">
-                        <input type="text" data-type="topic" value="${topic}" placeholder="مبحث/فصل" oninput="syncPrintContent(this)">
-                        <input type="number" data-type="count" value="${count}" placeholder="تعداد" min="0" oninput="syncPrintContent(this)">
-                        
-                        <select data-type="type" onchange="syncPrintContent(this)">
-                            <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
-                            <option value="descriptive" ${type === 'descriptive' ? 'selected' : ''}>تشریحی</option>
-                        </select>
-                        
-                        <button type="button" class="delete-btn" onclick="removeStudyPart(this)">
-                            <span class="material-icons" style="font-size: 18px;">delete</span>
-                        </button>
-
-                        <div class="print-content">
-                            <div>
-                                <span class="print-label">کتاب:</span> 
-                                <span class="print-value" data-bind="book">${book || '---'}</span>
-                            </div>
-                            <div>
-                                <span class="print-label">مبحث:</span> 
-                                <span class="print-value" data-bind="topic">${topic || '---'}</span>
-                            </div>
-                            <div>
-                                <span class="print-label print-type-count-label">
-                                    ${typeLabel}:
-                                </span> 
-                                <span class="print-value" data-bind="count">${count || '---'}</span>
+                    <div class="study-part-header">
+                        <div class="study-part-title">پارت مطالعاتی</div>
+                        <div class="study-part-actions">
+                            <button class="icon-btn" onclick="removeStudyPart(${id})">
+                                <span class="material-icons">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="study-part-details">
+                        <div class="detail-item">
+                            <div class="detail-label">کتاب</div>
+                            <div class="detail-value">
+                                <input type="text" value="${book}" placeholder="نام کتاب">
                             </div>
                         </div>
-
+                        <div class="detail-item">
+                            <div class="detail-label">مبحث/فصل</div>
+                            <div class="detail-value">
+                                <input type="text" value="${topic}" placeholder="مبحث یا فصل">
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">تعداد</div>
+                            <div class="detail-value">
+                                <input type="number" value="${count}" placeholder="تعداد" min="0">
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">نوع</div>
+                            <div class="detail-value">
+                                <div class="custom-select">
+                                    <select class="original-select">
+                                        <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
+                                        <option value="descriptive" ${type === 'descriptive' ? 'selected' : ''}>تشریحی</option>
+                                    </select>
+                                    <div class="custom-select-trigger">
+                                        <span>${typeLabel}</span>
+                                        <span class="material-icons">keyboard_arrow_down</span>
+                                    </div>
+                                    <div class="custom-options">
+                                        <div class="custom-option" data-value="test">تست</div>
+                                        <div class="custom-option" data-value="descriptive">تشریحی</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
         }
-        
-        // === تولید HTML بلوک زمانی (صبح/بعد از ظهر/شب) ===
-        function createTimePeriodHTML(periodName, icon, periodKey) {
+
+        // === تولید HTML برای مبحث کتاب (حالت علیرضا ترکمانی) ===
+        function createBookPartHTML(topic = '', count = '', type = 'test') {
+            const id = Date.now() + Math.floor(Math.random() * 1000);
+            const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
+
             return `
-                <div class="time-period-section" data-period="${periodKey}">
-                    <div class="time-period-header">
-                        <span class="material-icons">${icon}</span>
-                        <span>${periodName}</span>
-                    </div>
-                    <div class="study-parts">
+                <div class="study-part" data-id="${id}">
+                    <div class="study-part-header">
+                        <div class="study-part-title">مبحث مطالعاتی</div>
+                        <div class="study-part-actions">
+                            <button class="icon-btn" onclick="removeStudyPart(${id})">
+                                <span class="material-icons">delete</span>
+                            </button>
                         </div>
-                    <button type="button" class="add-part-btn" onclick="addStudyPart(this)">
-                        <span class="material-icons">add</span>
-                        افزودن پارت
-                    </button>
+                    </div>
+                    <div class="study-part-details">
+                        <div class="detail-item">
+                            <div class="detail-label">مبحث/فصل</div>
+                            <div class="detail-value">
+                                <input type="text" value="${topic}" placeholder="مبحث یا فصل">
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">تعداد</div>
+                            <div class="detail-value">
+                                <input type="number" value="${count}" placeholder="تعداد" min="0">
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">نوع</div>
+                            <div class="detail-value">
+                                <div class="custom-select">
+                                    <select class="original-select">
+                                        <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
+                                        <option value="descriptive" ${type === 'descriptive' ? 'selected' : ''}>تشریحی</option>
+                                    </select>
+                                    <div class="custom-select-trigger">
+                                        <span>${typeLabel}</span>
+                                        <span class="material-icons">keyboard_arrow_down</span>
+                                    </div>
+                                    <div class="custom-options">
+                                        <div class="custom-option" data-value="test">تست</div>
+                                        <div class="custom-option" data-value="descriptive">تشریحی</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         }
 
-        // === تولید HTML کارت روز ===
-        function createDayCardHTML(dayName) {
-            return `
-                <div class="day-card" data-day="${dayName}">
-                    <div class="day-header">${dayName}</div>
-                    ${createTimePeriodHTML('صبحگاهی', 'wb_sunny', 'morning')}
-                    ${createTimePeriodHTML('بعد از ظهر', 'schedule', 'afternoon')}
-                    ${createTimePeriodHTML('شبانه', 'nights_stay', 'evening')}
-                </div>
-            `;
-        }
-        
-        // === مدیریت پارت‌های مطالعاتی و همگام‌سازی ===
-        function addStudyPart(buttonElement) {
-            const studyPartsContainer = buttonElement.previousElementSibling;
+        // === توابع مدیریت پارت‌های مطالعاتی ===
+        function addStudyPart(dayName, period) {
+            const dayCard = document.querySelector(`.day-card[data-day="${dayName}"]`);
+            const studyPartsContainer = dayCard.querySelector(`.study-parts[data-period="${period}"]`);
             studyPartsContainer.insertAdjacentHTML('beforeend', createStudyPartHTML());
-            // هر بار که پارتی اضافه می‌شود، پرچم خالی بودن بخش زمانی را برمی‌داریم
-            const section = buttonElement.closest('.time-period-section');
-            if (section) section.removeAttribute('data-empty');
+            
+            // تنظیم مجدد رویدادها برای select های جدید
+            setupCustomSelects();
         }
 
-        function removeStudyPart(buttonElement) {
-            const studyPart = buttonElement.closest('.study-part');
-            const section = studyPart.closest('.time-period-section');
-            studyPart.remove();
+        function addBookPart(bookName) {
+            const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
+            const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
+            studyPartsContainer.insertAdjacentHTML('beforeend', createBookPartHTML());
             
-            // چک می‌کنیم اگر بعد از حذف، بخش زمانی خالی شد، پرچم خالی بودن را بگذاریم
-            if (section && section.querySelectorAll('.study-part').length === 0) {
-                section.setAttribute('data-empty', 'true');
-            }
+            // تنظیم مجدد رویدادها برای select های جدید
+            setupCustomSelects();
         }
 
-        // === همگام سازی مقادیر input/select با محتوای چاپی - **آپدیت شده** ===
-        function syncPrintContent(inputElement) {
-            const isSelect = inputElement.tagName === 'SELECT';
-            let value = inputElement.value;
-            const type = inputElement.getAttribute('data-type');
-            
-            if (isSelect) {
-                // اگر select بود، محتوای متنی انتخاب شده را بگیریم
-                value = inputElement.options[inputElement.selectedIndex].text;
-            }
-
-            const displayValue = value || '---';
-            
-            // پیدا کردن عنصر study-part
-            const studyPart = inputElement.closest('.study-part');
-            const printValueElement = studyPart.querySelector(`.print-value[data-bind="${type}"]`);
-            
-            if (printValueElement) {
-                printValueElement.textContent = displayValue;
-            }
-
-            // **تغییر: آپدیت لیبل نوع (تست/تشریحی)**
-            if (isSelect || type === 'count') {
-                const typeLabelElement = studyPart.querySelector('.print-type-count-label');
-                const selectElement = studyPart.querySelector('select[data-type="type"]');
-                if (typeLabelElement && selectElement) {
-                    const selectedTypeText = selectElement.options[selectElement.selectedIndex].text;
-                    typeLabelElement.textContent = `${selectedTypeText}:`;
-                }
+        function removeStudyPart(id) {
+            const studyPart = document.querySelector(`.study-part[data-id="${id}"]`);
+            if (studyPart) {
+                studyPart.remove();
             }
         }
 
-
-        // === تابع اصلی تولید برنامه هفتگی ===
-        function renderWeeklySchedule() {
-            const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+        // === تابع اصلی برای رندر کردن برنامه ===
+        function renderSchedule() {
             const daysContainer = document.getElementById('daysContainer');
-            daysContainer.innerHTML = ''; 
+            const scheduleTitle = document.getElementById('scheduleTitle');
             
-            days.forEach(day => {
-                daysContainer.insertAdjacentHTML('beforeend', createDayCardHTML(day));
-            });
+            daysContainer.innerHTML = '';
             
-            // تنظیم تاریخ پیش‌فرض شمسی (عددی)
-            document.getElementById('reportDate').value = getPersianDateNumeric();
+            if (currentCounselorType === 'standard') {
+                // حالت استاندارد - بر اساس روزهای هفته
+                scheduleTitle.innerHTML = `
+                    <span class="material-icons">view_week</span>
+                    برنامه هفتگی مطالعه
+                `;
+                
+                const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+                days.forEach((day, index) => {
+                    daysContainer.insertAdjacentHTML('beforeend', createDayCardHTML(day, index));
+                });
+            } else if (currentCounselorType === 'alireza-torkamani') {
+                // حالت علیرضا ترکمانی - بر اساس کتاب‌ها
+                scheduleTitle.innerHTML = `
+                    <span class="material-icons">auto_stories</span>
+                    برنامه مطالعاتی بر اساس کتاب‌ها
+                `;
+                
+                // اضافه کردن دکمه افزودن کتاب
+                daysContainer.insertAdjacentHTML('beforeend', `
+                    <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
+                        <span class="material-icons">add_circle</span>
+                        افزودن کتاب جدید
+                    </button>
+                `);
+            }
             
-            // تنظیم همه بخش‌های زمانی به حالت خالی (پیش‌فرض)
-            document.querySelectorAll('.time-period-section').forEach(section => {
-                 section.setAttribute('data-empty', 'true');
-            });
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
         }
-        
-        // === آماده‌سازی برای چاپ (PDF) ===
-        function prepareForPrint() {
-            // 1. نمایش و پر کردن اطلاعات اولیه برای PDF
-            const pdfInfo = document.getElementById('pdfInfo');
-            const counselorName = document.getElementById('counselorName').value;
-            const studentName = document.getElementById('studentName').value;
-            const reportDate = document.getElementById('reportDate').value;
 
-            pdfInfo.innerHTML = `
-                <div><b>مشاور:</b> ${counselorName || '---'}</div>
-                <div><b>دانش‌آموز:</b> ${studentName || '---'}</div>
-                <div><b>تاریخ گزارش:</b> ${reportDate || '---'}</div>
+        // === جمع‌آوری داده‌ها از فرم ===
+        function collectFormData() {
+            const data = {
+                counselor: {
+                    name: document.getElementById('counselorName').value,
+                    contact: document.getElementById('counselorContact').value
+                },
+                student: {
+                    name: document.getElementById('studentName').value,
+                    grade: document.getElementById('studentGrade').value,
+                    field: document.getElementById('studentField').value
+                },
+                program: {
+                    date: document.getElementById('reportDate').value,
+                    weekNumber: currentCounselorType === 'standard' ? document.getElementById('weekNumber').value : '',
+                    dateRange: currentCounselorType === 'alireza-torkamani' ? document.getElementById('dateRange').value : ''
+                },
+                counselorType: currentCounselorType,
+                days: {},
+                books: {},
+                routine: {
+                    description: document.getElementById('routineDescription').value,
+                    sleepTime: document.getElementById('sleepTime').value,
+                    wakeTime: document.getElementById('wakeTime').value
+                }
+            };
+
+            if (currentCounselorType === 'standard') {
+                // جمع‌آوری اطلاعات روزها
+                document.querySelectorAll('.day-card[data-day]').forEach(dayCard => {
+                    const dayName = dayCard.dataset.day;
+                    const dayData = {
+                        periods: {},
+                        notes: dayCard.querySelector('.day-notes-content').value
+                    };
+
+                    ['morning', 'afternoon', 'evening'].forEach(period => {
+                        const studyParts = [];
+                        dayCard.querySelectorAll(`.study-parts[data-period="${period}"] .study-part`).forEach(part => {
+                            const inputs = part.querySelectorAll('input');
+                            const select = part.querySelector('.original-select');
+                            studyParts.push({
+                                book: inputs[0].value,
+                                topic: inputs[1].value,
+                                count: inputs[2].value,
+                                type: select ? select.value : 'test'
+                            });
+                        });
+                        dayData.periods[period] = studyParts;
+                    });
+
+                    data.days[dayName] = dayData;
+                });
+            } else if (currentCounselorType === 'alireza-torkamani') {
+                // جمع‌آوری اطلاعات کتاب‌ها
+                document.querySelectorAll('.day-card[data-book]').forEach(bookCard => {
+                    const bookName = bookCard.dataset.book;
+                    const bookData = {
+                        parts: [],
+                        notes: bookCard.querySelector('.day-notes-content').value
+                    };
+
+                    bookCard.querySelectorAll(`.study-parts[data-book="${bookName}"] .study-part`).forEach(part => {
+                        const inputs = part.querySelectorAll('input');
+                        const select = part.querySelector('.original-select');
+                        bookData.parts.push({
+                            topic: inputs[0].value,
+                            count: inputs[1].value,
+                            type: select ? select.value : 'test'
+                        });
+                    });
+
+                    data.books[bookName] = bookData;
+                });
+            }
+
+            return data;
+        }
+
+        // === بارگذاری داده‌ها در فرم ===
+        function loadFormData(data) {
+            // تغییر نوع مشاور اگر در داده‌ها مشخص شده باشد
+            if (data.counselorType) {
+                switchCounselorType(data.counselorType, false);
+            }
+
+            // بارگذاری اطلاعات مشاور
+            document.getElementById('counselorName').value = data.counselor?.name || '';
+            document.getElementById('counselorContact').value = data.counselor?.contact || '';
+
+            // بارگذاری اطلاعات دانش‌آموز
+            document.getElementById('studentName').value = data.student?.name || '';
+            
+            // بارگذاری پایه تحصیلی
+            const studentGradeSelect = document.getElementById('studentGrade');
+            studentGradeSelect.value = data.student?.grade || '';
+            updateCustomSelect(studentGradeSelect);
+            
+            // بارگذاری رشته تحصیلی
+            document.getElementById('studentField').value = data.student?.field || '';
+            updateCustomSelect(document.getElementById('studentField'));
+            
+            // بررسی و نمایش/مخفی کردن فیلد رشته تحصیلی
+            toggleStudentField();
+
+            // بارگذاری اطلاعات برنامه
+            document.getElementById('reportDate').value = data.program?.date || getPersianDate();
+            
+            if (currentCounselorType === 'standard') {
+                document.getElementById('weekNumber').value = data.program?.weekNumber || '';
+            } else if (currentCounselorType === 'alireza-torkamani') {
+                document.getElementById('dateRange').value = data.program?.dateRange || '';
+            }
+
+            // بارگذاری روتین شبانه
+            document.getElementById('routineDescription').value = data.routine?.description || '';
+            document.getElementById('sleepTime').value = data.routine?.sleepTime || '';
+            document.getElementById('wakeTime').value = data.routine?.wakeTime || '';
+
+            // بارگذاری اطلاعات برنامه
+            if (currentCounselorType === 'standard' && data.days) {
+                Object.keys(data.days).forEach(dayName => {
+                    const dayCard = document.querySelector(`.day-card[data-day="${dayName}"]`);
+                    if (dayCard && data.days[dayName]) {
+                        // بارگذاری توضیحات روز
+                        dayCard.querySelector('.day-notes-content').value = data.days[dayName].notes || '';
+
+                        // بارگذاری پارت‌های مطالعاتی
+                        ['morning', 'afternoon', 'evening'].forEach(period => {
+                            const studyPartsContainer = dayCard.querySelector(`.study-parts[data-period="${period}"]`);
+                            // پاک کردن پارت‌های موجود
+                            studyPartsContainer.innerHTML = '';
+
+                            if (data.days[dayName].periods && data.days[dayName].periods[period]) {
+                                data.days[dayName].periods[period].forEach(part => {
+                                    studyPartsContainer.insertAdjacentHTML('beforeend', 
+                                        createStudyPartHTML(part.book, part.topic, part.count, part.type)
+                                    );
+                                });
+                            }
+                        });
+                    }
+                });
+            } else if (currentCounselorType === 'alireza-torkamani' && data.books) {
+                // رندر کردن کتاب‌های موجود
+                const daysContainer = document.getElementById('daysContainer');
+                Object.keys(data.books).forEach((bookName, index) => {
+                    daysContainer.insertAdjacentHTML('beforeend', createBookCardHTML(bookName, index));
+                });
+                
+                // بارگذاری اطلاعات کتاب‌ها
+                Object.keys(data.books).forEach(bookName => {
+                    const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
+                    if (bookCard && data.books[bookName]) {
+                        // بارگذاری توضیحات کتاب
+                        bookCard.querySelector('.day-notes-content').value = data.books[bookName].notes || '';
+
+                        // بارگذاری مباحث مطالعاتی
+                        const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
+                        // پاک کردن پارت‌های موجود
+                        studyPartsContainer.innerHTML = '';
+
+                        if (data.books[bookName].parts) {
+                            data.books[bookName].parts.forEach(part => {
+                                studyPartsContainer.insertAdjacentHTML('beforeend', 
+                                    createBookPartHTML(part.topic, part.count, part.type)
+                                );
+                            });
+                        }
+                    }
+                });
+            }
+            
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
+        }
+
+        // === تابع برای تغییر نوع مشاور ===
+        function switchCounselorType(type, showNotification = true) {
+            currentCounselorType = type;
+            
+            // به‌روزرسانی نمایش مشاور فعلی
+            const trigger = document.getElementById('counselorTrigger');
+            const name = document.getElementById('currentCounselorName');
+            const icon = trigger.querySelector('.counselor-trigger-icon');
+            const badge = trigger.querySelector('.counselor-trigger-badge');
+            
+            if (type === 'standard') {
+                trigger.classList.remove('active');
+                name.textContent = 'حالت استاندارد';
+                icon.innerHTML = '<span class="material-icons">schedule</span>';
+                badge.className = 'counselor-trigger-badge';
+                
+                // نمایش/مخفی کردن فیلدهای مربوطه
+                document.getElementById('weekNumberGroup').style.display = 'block';
+                document.getElementById('dateRangeGroup').style.display = 'none';
+            } else if (type === 'alireza-torkamani') {
+                trigger.classList.add('active');
+                name.textContent = 'علیرضا ترکمانی';
+                icon.innerHTML = '<span class="material-icons">auto_stories</span>';
+                badge.className = 'counselor-trigger-badge special';
+                
+                // نمایش/مخفی کردن فیلدهای مربوطه
+                document.getElementById('weekNumberGroup').style.display = 'none';
+                document.getElementById('dateRangeGroup').style.display = 'block';
+            }
+            
+            // رندر مجدد برنامه
+            renderSchedule();
+            
+            if (showNotification) {
+                const counselorName = type === 'standard' ? 'حالت استاندارد' : 'علیرضا ترکمانی';
+                showToast(`تغییر به ${counselorName} با موفقیت انجام شد`, 'success');
+            }
+        }
+
+        // === تابع برای نمایش/مخفی کردن فیلد رشته تحصیلی ===
+        function toggleStudentField() {
+            const studentGrade = document.getElementById('studentGrade').value;
+            const studentFieldGroup = document.getElementById('studentFieldGroup');
+            
+            if (studentGrade === 'هفتم' || studentGrade === 'هشتم' || studentGrade === 'نهم') {
+                studentFieldGroup.style.display = 'none';
+            } else {
+                studentFieldGroup.style.display = 'block';
+            }
+        }
+
+        // === دیالوگ نام‌گذاری فایل ===
+        function showFileNameDialog(defaultName, callback) {
+            const modal = document.getElementById('fileNameModal');
+            const input = document.getElementById('fileNameInput');
+            
+            input.value = defaultName;
+            currentFileNameCallback = callback;
+            
+            modal.classList.add('active');
+            
+            // تمرکز روی input
+            setTimeout(() => {
+                input.focus();
+                input.select();
+            }, 100);
+        }
+
+        // === تولید محتوای HTML برای خروجی ===
+        function generateHTMLContent() {
+            const data = collectFormData();
+            
+            // رنگ‌بندی برای دروس
+            const subjectColors = {
+                'ریاضی': 'math',
+                'فیزیک': 'math',
+                'شیمی': 'science',
+                'زیست‌شناسی': 'science',
+                'علوم': 'science',
+                'زبان انگلیسی': 'language',
+                'زبان عربی': 'arabic',
+                'فارسی': 'literature',
+                'ادبیات': 'literature',
+                'تاریخ': 'history',
+                'جغرافیا': 'history',
+                'فلسفه': 'history',
+                'دین و زندگی': 'religion',
+                'قرآن': 'religion',
+                'عربی': 'arabic'
+            };
+
+            // تابع برای تشخیص رنگ درس
+            function getSubjectColor(bookName) {
+                for (const [subject, color] of Object.entries(subjectColors)) {
+                    if (bookName.includes(subject)) {
+                        return color;
+                    }
+                }
+                return 'math'; // رنگ پیش‌فرض
+            }
+
+            const styles = `
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 20mm;
+                    }
+                    body {
+                        font-family: 'Vazirmatn', sans-serif;
+                        direction: rtl;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1.6;
+                    }
+                    .pdf-header {
+                        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+                        color: white;
+                        padding: 40px;
+                        text-align: center;
+                        position: relative;
+                        overflow: hidden;
+                        border-radius: 12px;
+                        margin-bottom: 30px;
+                    }
+                    .pdf-header::before {
+                        content: '';
+                        position: absolute;
+                        top: -50px;
+                        right: -50px;
+                        width: 200px;
+                        height: 200px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .pdf-header::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -30px;
+                        left: -30px;
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .pdf-logo-container {
+                        display: inline-block;
+                        background-color: white;
+                        padding: 10px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                        margin-bottom: 20px;
+                    }
+                    .pdf-logo {
+                        max-width: 120px;
+                        height: auto;
+                        border-radius: 8px;
+                        display: block;
+                    }
+                    .pdf-title {
+                        font-size: 36px;
+                        font-weight: 800;
+                        margin-bottom: 10px;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .pdf-subtitle {
+                        font-size: 18px;
+                        opacity: 0.9;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .pdf-info {
+                        background-color: #f0f7ff;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border-radius: 12px;
+                        border: 2px solid #e6f2ff;
+                    }
+                    .pdf-info-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .pdf-info-label {
+                        font-weight: 700;
+                        color: #1a365d;
+                        min-width: 80px;
+                    }
+                    .pdf-info-value {
+                        color: #2d3748;
+                        font-weight: 500;
+                    }
+                    .pdf-schedule {
+                        background-color: white;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        margin-bottom: 30px;
+                    }
+                    .pdf-schedule-header {
+                        background-color: #3182ce;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                    }
+                    .pdf-schedule-title {
+                        font-size: 24px;
+                        font-weight: 700;
+                    }
+                    .pdf-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .pdf-table th {
+                        background-color: #2c5282;
+                        color: white;
+                        padding: 15px;
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: 600;
+                    }
+                    .pdf-table td {
+                        padding: 12px 15px;
+                        text-align: center;
+                        border-bottom: 1px solid #e2e8f0;
+                        font-size: 14px;
+                        vertical-align: top; /* تغییر از middle به top */
+                    }
+                    .pdf-table tr:nth-child(even) {
+                        background-color: #f8fafc;
+                    }
+                    .pdf-day-cell, .pdf-book-cell {
+                        background-color: #edf2f7;
+                        font-weight: 600;
+                        color: #2d3748;
+                    }
+                    .pdf-subject {
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        margin: 2px;
+                    }
+                    .pdf-subject-math {
+                        background-color: rgba(233, 30, 99, 0.15);
+                        color: #c2185b;
+                    }
+                    .pdf-subject-science {
+                        background-color: rgba(76, 175, 80, 0.15);
+                        color: #388e3c;
+                    }
+                    .pdf-subject-language {
+                        background-color: rgba(33, 150, 243, 0.15);
+                        color: #1976d2;
+                    }
+                    .pdf-subject-history {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                    }
+                    .pdf-subject-literature {
+                        background-color: rgba(156, 39, 176, 0.15);
+                        color: #7b1fa2;
+                    }
+                    .pdf-subject-arabic {
+                        background-color: rgba(0, 188, 212, 0.15);
+                        color: #0097a7;
+                    }
+                    .pdf-subject-religion {
+                        background-color: rgba(76, 175, 80, 0.15);
+                        color: #388e3c;
+                    }
+                    .pdf-subject-empty {
+                        color: #a0aec0;
+                        font-style: italic;
+                    }
+                    .pdf-routine {
+                        background-color: #f0f7ff;
+                        border-radius: 12px;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border: 2px solid #e6f2ff;
+                    }
+                    .pdf-routine-title {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #1a365d;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    .pdf-routine-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-routine-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .pdf-routine-label {
+                        font-weight: 600;
+                        color: #2c5282;
+                        min-width: 120px;
+                    }
+                    .pdf-routine-value {
+                        color: #2d3748;
+                    }
+                    .pdf-notes {
+                        background-color: #f7fafc;
+                        border-radius: 12px;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border: 1px solid #e2e8f0;
+                    }
+                    .pdf-notes-title {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #1a365d;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    .pdf-notes-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-note-item {
+                        background-color: white;
+                        padding: 15px;
+                        border-radius: 8px;
+                        border-right: 4px solid #3182ce;
+                    }
+                    .pdf-note-day, .pdf-note-book {
+                        font-weight: 600;
+                        color: #1a365d;
+                        margin-bottom: 8px;
+                    }
+                    .pdf-note-content {
+                        color: #4a5568;
+                        font-size: 14px;
+                    }
+                    .pdf-footer {
+                        background-color: #1a365d;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                        border-radius: 12px;
+                    }
+                    .pdf-footer-text {
+                        font-size: 14px;
+                        opacity: 0.9;
+                    }
+                    @media print {
+                        .pdf-info-grid,
+                        .pdf-routine-grid,
+                        .pdf-notes-grid {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                </style>
             `;
-            
-            // 2. اعمال پرچم خالی بودن/نبودن برای پنهان‌سازی بخش‌های خالی در CSS
-            document.querySelectorAll('.time-period-section').forEach(section => {
-                const partsCount = section.querySelector('.study-parts').children.length;
-                if (partsCount === 0) {
-                    section.setAttribute('data-empty', 'true');
-                } else {
-                    section.removeAttribute('data-empty');
-                }
-            });
 
-            // 3. فراخوانی دستور چاپ
-            window.print();
+            let scheduleTableHTML = '';
+            
+            if (data.counselorType === 'standard') {
+                // جدول برنامه هفتگی (حالت استاندارد)
+                scheduleTableHTML = `
+                    <div class="pdf-schedule">
+                        <div class="pdf-schedule-header">
+                            <h2 class="pdf-schedule-title">جدول برنامه هفتگی</h2>
+                        </div>
+                        <table class="pdf-table">
+                            <thead>
+                                <tr>
+                                    <th>روز / بازه زمانی</th>
+                                    <th>صبحگاهی</th>
+                                    <th>بعد از ظهر</th>
+                                    <th>شبانه</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
+                                    const morningParts = data.days[day]?.periods?.morning || [];
+                                    const afternoonParts = data.days[day]?.periods?.afternoon || [];
+                                    const eveningParts = data.days[day]?.periods?.evening || [];
+
+                                    const renderParts = (parts) => {
+                                        if (parts.length === 0) {
+                                            return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
+                                        }
+                                        return parts.map(part => {
+                                            const colorClass = getSubjectColor(part.book);
+                                            const typeText = part.type === 'test' ? 'تست' : 'تشریحی';
+                                            const text = part.book ? `${part.book} - ${part.topic || ''} (${part.count || ''} ${typeText})` : '---';
+                                            return `<span class="pdf-subject pdf-subject-${colorClass}">${text}</span>`;
+                                        }).join('<br>');
+                                    };
+
+                                    return `
+                                        <tr>
+                                            <td class="pdf-day-cell">${day}</td>
+                                            <td>${renderParts(morningParts)}</td>
+                                            <td>${renderParts(afternoonParts)}</td>
+                                            <td>${renderParts(eveningParts)}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (data.counselorType === 'alireza-torkamani') {
+                // جدول برنامه کتاب‌محور (حالت علیرضا ترکمانی)
+                const bookNames = Object.keys(data.books);
+                if (bookNames.length > 0) {
+                    scheduleTableHTML = `
+                        <div class="pdf-schedule">
+                            <div class="pdf-schedule-header">
+                                <h2 class="pdf-schedule-title">جدول برنامه مطالعاتی بر اساس کتاب‌ها</h2>
+                            </div>
+                            <table class="pdf-table">
+                                <thead>
+                                    <tr>
+                                        <th>بازه زمانی</th>
+                                        ${bookNames.map(bookName => `<th>${bookName}</th>`).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="pdf-day-cell">${data.program.dateRange || '---'}</td>
+                                        ${bookNames.map(bookName => {
+                                            const bookParts = data.books[bookName]?.parts || [];
+                                            const renderParts = (parts) => {
+                                                if (parts.length === 0) {
+                                                    return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
+                                                }
+                                                return parts.map(part => {
+                                                    const typeText = part.type === 'test' ? 'تست' : 'تشریحی';
+                                                    const text = part.topic ? `${part.topic} (${part.count || ''} ${typeText})` : '---';
+                                                    return `<span class="pdf-subject pdf-subject-${getSubjectColor(bookName)}">${text}</span>`;
+                                                }).join('<br>');
+                                            };
+                                            return `<td>${renderParts(bookParts)}</td>`;
+                                        }).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+
+            const content = `
+                <!DOCTYPE html>
+                <html lang="fa" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>برنامه مطالعه - ${data.student.name || 'دانش‌آموز'}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                    ${styles}
+                </head>
+                <body>
+                    <!-- صفحه عنوان -->
+                    <div class="pdf-header">
+                        <div class="pdf-logo-container">
+                            <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="pdf-logo">
+                        </div>
+                        <h1 class="pdf-title">برنامه ${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی مطالعه'}</h1>
+                        <p class="pdf-subtitle">آکادمی تحصیلی رادیان</p>
+                    </div>
+
+                    <!-- اطلاعات اصلی -->
+                    <div class="pdf-info">
+                        <div class="pdf-info-grid">
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">مشاور:</span>
+                                <span class="pdf-info-value">${data.counselor.name || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">شماره تماس:</span>
+                                <span class="pdf-info-value">${data.counselor.contact || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">دانش‌آموز:</span>
+                                <span class="pdf-info-value">${data.student.name || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">پایه تحصیلی:</span>
+                                <span class="pdf-info-value">${data.student.grade || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">رشته تحصیلی:</span>
+                                <span class="pdf-info-value">${data.student.field || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">${data.counselorType === 'alireza-torkamani' ? 'بازه زمانی:' : 'شماره هفته:'}</span>
+                                <span class="pdf-info-value">${data.counselorType === 'alireza-torkamani' ? (data.program.dateRange || '---') : (data.program.weekNumber || '---')}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">تاریخ برنامه‌ریزی:</span>
+                                <span class="pdf-info-value">${data.program.date || '---'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${scheduleTableHTML}
+
+                    <!-- روتین شبانه -->
+                    <div class="pdf-routine">
+                        <h2 class="pdf-routine-title">روتین شبانه</h2>
+                        <div class="pdf-routine-grid">
+                            <div class="pdf-routine-item">
+                                <span class="pdf-routine-label">زمان خواب:</span>
+                                <span class="pdf-routine-value">${data.routine.sleepTime || '---'}</span>
+                            </div>
+                            <div class="pdf-routine-item">
+                                <span class="pdf-routine-label">زمان بیداری:</span>
+                                <span class="pdf-routine-value">${data.routine.wakeTime || '---'}</span>
+                            </div>
+                        </div>
+                        ${data.routine.description ? `
+                            <div style="margin-top: 20px;">
+                                <div style="font-weight: 600; color: #2c5282; margin-bottom: 10px;">توضیحات کلی:</div>
+                                <div style="color: #4a5568; line-height: 1.6;">${data.routine.description}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- توضیحات روزانه/کتابی -->
+                    <div class="pdf-notes">
+                        <h2 class="pdf-notes-title">توضیحات ${data.counselorType === 'alireza-torkamani' ? 'کتابی' : 'روزانه'}</h2>
+                        <div class="pdf-notes-grid">
+                            ${data.counselorType === 'standard' ? 
+                                ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
+                                    const notes = data.days[day]?.notes || '';
+                                    if (notes && notes !== `توضیحات مربوط به ${day} را در اینجا وارد کنید...`) {
+                                        return `
+                                            <div class="pdf-note-item">
+                                                <div class="pdf-note-day">${day}:</div>
+                                                <div class="pdf-note-content">${notes}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).filter(item => item !== '').join('') :
+                                Object.keys(data.books).map(bookName => {
+                                    const notes = data.books[bookName]?.notes || '';
+                                    if (notes && notes !== `توضیحات مربوط به کتاب ${bookName} را در اینجا وارد کنید...`) {
+                                        return `
+                                            <div class="pdf-note-item">
+                                                <div class="pdf-note-book">${bookName}:</div>
+                                                <div class="pdf-note-content">${notes}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).filter(item => item !== '').join('')
+                            }
+                        </div>
+                    </div>
+
+                    <!-- فوتر -->
+                    <div class="pdf-footer">
+                        <p class="pdf-footer-text">این برنامه توسط آکادمی تحصیلی رادیان تهیه شده است | ${getPersianDate()}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            return content;
         }
 
+        // === دانلود مستقیم HTML با استفاده از Blob ===
+        function downloadHTMLDirectly(fileName) {
+            showToast('در حال آماده‌سازی HTML...', 'warning');
+            
+            try {
+                // تولید محتوای HTML
+                const htmlContent = generateHTMLContent();
+                
+                // ایجاد یک Blob از محتوای HTML
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                
+                // ایجاد یک URL برای Blob
+                const url = URL.createObjectURL(blob);
+                
+                // ایجاد یک لینک دانلود موقت
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${fileName}.html`;
+                
+                // اضافه کردن لینک به صفحه و کلیک روی آن
+                document.body.appendChild(link);
+                link.click();
+                
+                // حذف لینک و آزاد کردن URL
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                showToast('فایل HTML با موفقیت دانلود شد', 'success');
+                
+            } catch (error) {
+                console.error('خطا در دانلود فایل:', error);
+                showToast('خطا در دانلود فایل. لطفاً دوباره تلاش کنید.', 'error');
+            }
+        }
 
-        // === رویدادها - **آپدیت شده** ===
-        document.addEventListener('DOMContentLoaded', () => {
-            renderWeeklySchedule();
+        // === پیش‌نمایش ===
+        function previewHTML() {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewBody = document.getElementById('previewBody');
             
-            document.getElementById('downloadPdfBtn').addEventListener('click', prepareForPrint);
+            previewContainer.classList.add('active');
+            previewBody.innerHTML = '<div style="text-align: center; padding: 50px;">در حال بارگذاری پیش‌نمایش...</div>';
             
-            // افزودن Event Listener برای همگام سازی داده‌های input (کتاب، مبحث، تعداد)
-            document.getElementById('daysContainer').addEventListener('input', (event) => {
-                const target = event.target;
-                if (target.tagName === 'INPUT' || target.tagName === 'SELECT') {
-                    syncPrintContent(target);
+            try {
+                // تولید محتوای HTML
+                const htmlContent = generateHTMLContent();
+                
+                // نمایش محتوا در iframe
+                previewBody.innerHTML = `<iframe srcdoc="${htmlContent.replace(/"/g, '&quot;')}" style="width: 100%; height: 100%; border: none;"></iframe>`;
+            } catch (error) {
+                console.error('خطا در پیش‌نمایش:', error);
+                previewBody.innerHTML = '<div style="text-align: center; padding: 50px; color: red;">خطا در بارگذاری پیش‌نمایش</div>';
+            }
+        }
+
+        // === توابع مربوط به وارد کردن HTML ===
+        function setupImportModal() {
+            const importModal = document.getElementById('importModal');
+            const importHtmlBtn = document.getElementById('importHtmlBtn');
+            const closeImportModal = document.getElementById('closeImportModal');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            
+            if (importHtmlBtn) {
+                importHtmlBtn.addEventListener('click', () => {
+                    // ریست کردن فرم و نتایج قبلی
+                    document.getElementById('uploadResult').style.display = 'none';
+                    fileInput.value = '';
+                    importModal.classList.add('active');
+                });
+            }
+            
+            if (closeImportModal) {
+                closeImportModal.addEventListener('click', () => {
+                    importModal.classList.remove('active');
+                });
+            }
+            
+            if (uploadArea) {
+                uploadArea.addEventListener('click', () => {
+                    fileInput.click();
+                });
+                
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = '#e6f2ff';
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.style.backgroundColor = '#f0f7ff';
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.style.backgroundColor = '#f0f7ff';
+                    
+                    if (e.dataTransfer.files.length) {
+                        handleFileUpload(e.dataTransfer.files[0]);
+                    }
+                });
+            }
+            
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length) {
+                        handleFileUpload(fileInput.files[0]);
+                    }
+                });
+            }
+        }
+
+        // === استخراج داده از HTML (نسخه اصلاح شده) ===
+        function extractDataFromHTML(htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            
+            // تشخیص نوع مشاور از عنوان
+            const title = doc.querySelector('.pdf-title')?.textContent || '';
+            const isAlirezaTorkamani = title.includes('مطالعاتی');
+            
+            // استخراج اطلاعات از بخش اطلاعات اصلی
+            const data = {
+                counselor: {
+                    name: '',
+                    contact: ''
+                },
+                student: {
+                    name: '',
+                    grade: '',
+                    field: ''
+                },
+                program: {
+                    date: '',
+                    weekNumber: '',
+                    dateRange: ''
+                },
+                counselorType: isAlirezaTorkamani ? 'alireza-torkamani' : 'standard',
+                days: {},
+                books: {},
+                routine: {
+                    description: '',
+                    sleepTime: '',
+                    wakeTime: ''
+                }
+            };
+
+            // استخراج اطلاعات از بخش اطلاعات اصلی
+            const infoItems = doc.querySelectorAll('.pdf-info-item');
+            infoItems.forEach(item => {
+                const label = item.querySelector('.pdf-info-label')?.textContent.trim();
+                const value = item.querySelector('.pdf-info-value')?.textContent.trim();
+                
+                if (label === 'مشاور:') {
+                    data.counselor.name = value;
+                } else if (label === 'شماره تماس:') {
+                    data.counselor.contact = value;
+                } else if (label === 'دانش‌آموز:') {
+                    data.student.name = value;
+                } else if (label === 'پایه تحصیلی:') {
+                    data.student.grade = value;
+                } else if (label === 'رشته تحصیلی:') {
+                    data.student.field = value;
+                } else if (label === 'شماره هفته:') {
+                    data.program.weekNumber = value;
+                } else if (label === 'بازه زمانی:') {
+                    data.program.dateRange = value;
+                } else if (label === 'تاریخ برنامه‌ریزی:') {
+                    data.program.date = value;
                 }
             });
-        });
 
+            // استخراج اطلاعات روتین شبانه
+            const routineItems = doc.querySelectorAll('.pdf-routine-item');
+            routineItems.forEach(item => {
+                const label = item.querySelector('.pdf-routine-label')?.textContent.trim();
+                const value = item.querySelector('.pdf-routine-value')?.textContent.trim();
+                
+                if (label === 'زمان خواب:') {
+                    data.routine.sleepTime = value;
+                } else if (label === 'زمان بیداری:') {
+                    data.routine.wakeTime = value;
+                }
+            });
+
+            // استخراج توضیحات کلی روتین شبانه
+            const routineDescription = doc.querySelector('.pdf-routine div[style*="margin-top: 20px;"] div:last-child');
+            if (routineDescription) {
+                data.routine.description = routineDescription.textContent.trim();
+            }
+
+            if (isAlirezaTorkamani) {
+                // استخراج اطلاعات کتاب‌ها از جدول
+                const tableHeaders = doc.querySelectorAll('.pdf-table th');
+                const bookNames = [];
+                
+                // استخراج نام کتاب‌ها از هدر جدول
+                for (let i = 1; i < tableHeaders.length; i++) {
+                    bookNames.push(tableHeaders[i].textContent.trim());
+                }
+                
+                // استخراج بازه زمانی از جدول
+                const dateRangeCell = doc.querySelector('.pdf-table tbody tr td:first-child');
+                if (dateRangeCell) {
+                    data.program.dateRange = dateRangeCell.textContent.trim();
+                }
+                
+                // استخراج اطلاعات هر کتاب
+                const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
+                if (tableRows.length > 0) {
+                    const cells = tableRows[0].querySelectorAll('td');
+                    
+                    for (let i = 1; i < cells.length && i - 1 < bookNames.length; i++) {
+                        const bookName = bookNames[i - 1];
+                        const partsHTML = cells[i].innerHTML;
+                        
+                        // تابع برای استخراج پارت‌ها از HTML
+                        const extractParts = (html) => {
+                            const parts = [];
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            
+                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectSpans.forEach(span => {
+                                const text = span.textContent.trim();
+                                // فرمت: "مبحث (تعداد نوع)"
+                                const match = text.match(/^(.+?)\s*\((\d+)\s*(.+?)\)$/);
+                                if (match) {
+                                    parts.push({
+                                        topic: match[1].trim(),
+                                        count: match[2].trim(),
+                                        type: match[3].trim() === 'تست' ? 'test' : 'descriptive'
+                                    });
+                                }
+                            });
+                            
+                            return parts;
+                        };
+                        
+                        data.books[bookName] = {
+                            parts: extractParts(partsHTML),
+                            notes: ''
+                        };
+                    }
+                }
+
+                // استخراج توضیحات کتابی
+                const noteItems = doc.querySelectorAll('.pdf-note-item');
+                noteItems.forEach(item => {
+                    const bookName = item.querySelector('.pdf-note-book')?.textContent.trim().replace(':', '');
+                    const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
+                    
+                    if (bookName && data.books[bookName]) {
+                        data.books[bookName].notes = noteContent;
+                    }
+                });
+            } else {
+                // استخراج اطلاعات روزها از جدول برنامه هفتگی
+                const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
+                tableRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        const dayName = cells[0].textContent.trim();
+                        const morningHTML = cells[1].innerHTML;
+                        const afternoonHTML = cells[2].innerHTML;
+                        const eveningHTML = cells[3].innerHTML;
+                        
+                        // تابع برای استخراج پارت‌ها از HTML
+                        const extractParts = (html) => {
+                            const parts = [];
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            
+                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectSpans.forEach(span => {
+                                const text = span.textContent.trim();
+                                // فرمت: "کتاب - مبحث (تعداد نوع)"
+                                const match = text.match(/^(.+?)\s*-\s*(.+?)\s*\((\d+)\s*(.+?)\)$/);
+                                if (match) {
+                                    parts.push({
+                                        book: match[1].trim(),
+                                        topic: match[2].trim(),
+                                        count: match[3].trim(),
+                                        type: match[4].trim() === 'تست' ? 'test' : 'descriptive'
+                                    });
+                                }
+                            });
+                            
+                            return parts;
+                        };
+                        
+                        data.days[dayName] = {
+                            periods: {
+                                morning: extractParts(morningHTML),
+                                afternoon: extractParts(afternoonHTML),
+                                evening: extractParts(eveningHTML)
+                            },
+                            notes: ''
+                        };
+                    }
+                });
+
+                // استخراج توضیحات روزانه
+                const noteItems = doc.querySelectorAll('.pdf-note-item');
+                noteItems.forEach(item => {
+                    const dayName = item.querySelector('.pdf-note-day')?.textContent.trim().replace(':', '');
+                    const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
+                    
+                    if (dayName && data.days[dayName]) {
+                        data.days[dayName].notes = noteContent;
+                    }
+                });
+            }
+
+            return data;
+        }
+
+        function handleFileUpload(file) {
+            if (!file.type.includes('html')) {
+                showToast('لطفاً فقط فایل HTML آپلود کنید.', 'error');
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('حجم فایل نباید بیشتر از ۵ مگابایت باشد.', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const htmlContent = e.target.result;
+                    const data = extractDataFromHTML(htmlContent);
+                    loadFormData(data);
+                    
+                    // نمایش اطلاعات فایل
+                    const uploadResult = document.getElementById('uploadResult');
+                    const fileInfo = document.getElementById('fileInfo');
+                    
+                    fileInfo.innerHTML = `
+                        <p><strong>نام فایل:</strong> ${file.name}</p>
+                        <p><strong>حجم:</strong> ${(file.size / 1024).toFixed(2)} کیلوبایت</p>
+                        <p><strong>تاریخ آپلود:</strong> ${getPersianDate()}</p>
+                    `;
+                    
+                    uploadResult.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        document.getElementById('importModal').classList.remove('active');
+                        showToast('برنامه با موفقیت بارگذاری شد', 'success');
+                    }, 1500);
+                } catch (error) {
+                    console.error('خطا در خواندن فایل HTML:', error);
+                    showToast('خطا در خواندن فایل HTML. لطفاً فایل را بررسی کنید.', 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // === تنظیم دیالوگ نام‌گذاری ===
+        function setupFileNameDialog() {
+            const modal = document.getElementById('fileNameModal');
+            const closeBtn = document.getElementById('closeFileNameModal');
+            const confirmBtn = document.getElementById('confirmFileName');
+            const cancelBtn = document.getElementById('cancelFileName');
+            const input = document.getElementById('fileNameInput');
+            
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                currentFileNameCallback = null;
+            });
+            
+            cancelBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                currentFileNameCallback = null;
+            });
+            
+            confirmBtn.addEventListener('click', () => {
+                const fileName = input.value.trim();
+                if (fileName && currentFileNameCallback) {
+                    currentFileNameCallback(fileName);
+                    modal.classList.remove('active');
+                    currentFileNameCallback = null;
+                } else {
+                    showToast('لطفاً نام فایل را وارد کنید', 'error');
+                }
+            });
+            
+            // Enter برای تایید
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmBtn.click();
+                }
+            });
+            
+            // Esc برای انصراف
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'escape' && modal.classList.contains('active')) {
+                    cancelBtn.click();
+                }
+            });
+        }
+
+        // === تنظیم دیالوگ افزودن کتاب ===
+        function setupAddBookModal() {
+            const modal = document.getElementById('addBookModal');
+            const closeBtn = document.getElementById('closeAddBookModal');
+            const confirmBtn = document.getElementById('confirmAddBook');
+            const cancelBtn = document.getElementById('cancelAddBook');
+            const input = document.getElementById('bookNameInput');
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const bookName = input.value.trim();
+                    if (bookName) {
+                        addNewBook(bookName);
+                        modal.classList.remove('active');
+                        input.value = '';
+                    } else {
+                        showToast('لطفاً نام کتاب را وارد کنید', 'error');
+                    }
+                });
+            }
+            
+            // Enter برای تایید
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmBtn.click();
+                }
+            });
+            
+            // Esc برای انصراف
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    cancelBtn.click();
+                }
+            });
+        }
+
+        // === تنظیم دیالوگ انتخاب شخصی‌سازی ===
+        function setupCustomizationModal() {
+            const modal = document.getElementById('customizationModal');
+            const closeBtn = document.getElementById('closeCustomizationModal');
+            const confirmBtn = document.getElementById('confirmCustomization');
+            const cancelBtn = document.getElementById('cancelCustomization');
+            const options = modal.querySelectorAll('.customization-option');
+            
+            // تابع جدید برای باز کردن مودال و تنظیم انتخاب صحیح
+            function openCustomizationModal() {
+                // ریست کردن انتخاب بصری به وضعیت فعلی برنامه
+                options.forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (opt.getAttribute('data-counselor') === currentCounselorType) {
+                        opt.classList.add('selected');
+                    }
+                });
+                modal.classList.add('active');
+            }
+            
+            // رویداد کلیک روی بخش شخصی‌سازی
+            const counselorTrigger = document.getElementById('counselorTrigger');
+            counselorTrigger.addEventListener('click', openCustomizationModal);
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    const selectedOption = modal.querySelector('.customization-option.selected');
+                    if (selectedOption) {
+                        const counselorType = selectedOption.getAttribute('data-counselor');
+                        switchCounselorType(counselorType);
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+            
+            // رویداد کلیک روی گزینه‌ها
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+            
+            // Esc برای انصراف
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    cancelBtn.click();
+                }
+            });
+        }
+
+        // === تابع برای نمایش دیالوگ افزودن کتاب ===
+        function showAddBookModal() {
+            const modal = document.getElementById('addBookModal');
+            const input = document.getElementById('bookNameInput');
+            
+            modal.classList.add('active');
+            
+            // تمرکز روی input
+            setTimeout(() => {
+                input.focus();
+            }, 100);
+        }
+
+        // === تابع برای افزودن کتاب جدید ===
+        function addNewBook(bookName) {
+            const daysContainer = document.getElementById('daysContainer');
+            const existingBooks = daysContainer.querySelectorAll('.day-card[data-book]');
+            const bookIndex = existingBooks.length;
+            
+            // ایجاد کارت کتاب جدید
+            const bookCardHTML = createBookCardHTML(bookName, bookIndex);
+            
+            // پیدا کردن دکمه افزودن کتاب و اضافه کردن کارت قبل از آن
+            const addBookBtn = daysContainer.querySelector('.btn-primary');
+            addBookBtn.insertAdjacentHTML('beforebegin', bookCardHTML);
+            
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
+            
+            showToast(`کتاب "${bookName}" با موفقیت اضافه شد`, 'success');
+        }
+
+        // === تابع برای حذف کتاب ===
+        function deleteBook(bookName) {
+            const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
+            if (bookCard) {
+                bookCard.remove();
+                showToast(`کتاب "${bookName}" حذف شد`, 'warning');
+            }
+        }
+
+        // === تنظیم select های کاستوم ===
+        function setupCustomSelects() {
+            document.querySelectorAll('.custom-select').forEach(customSelect => {
+                const trigger = customSelect.querySelector('.custom-select-trigger');
+                const options = customSelect.querySelector('.custom-options');
+                const originalSelect = customSelect.querySelector('.original-select');
+                
+                if (!trigger || !options || !originalSelect) return;
+                
+                // حذف رویدادهای قبلی برای جلوگیری از تکرار
+                const newTrigger = trigger.cloneNode(true);
+                trigger.parentNode.replaceChild(newTrigger, trigger);
+                
+                newTrigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // بستن تمام منوهای باز دیگر
+                    document.querySelectorAll('.custom-options.active').forEach(opt => {
+                        if (opt !== options) {
+                            opt.classList.remove('active');
+                        }
+                    });
+                    
+                    options.classList.toggle('active');
+                });
+                
+                // تنظیم گزینه‌ها
+                const optionElements = options.querySelectorAll('.custom-option');
+                optionElements.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent;
+                        
+                        // به‌روزرسانی select اصلی
+                        originalSelect.value = value;
+                        
+                        // به‌روزرسانی متن نمایشی
+                        newTrigger.querySelector('span:first-child').textContent = text;
+                        
+                        // بستن منو
+                        options.classList.remove('active');
+                        
+                        // فعال کردن گزینه انتخاب شده
+                        optionElements.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        // اجرای رویداد change برای select اصلی
+                        const event = new Event('change', { bubbles: true });
+                        originalSelect.dispatchEvent(event);
+                    });
+                });
+            });
+            
+            // بستن تمام منوها با کلیک روی صفحه
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.custom-options.active').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+            });
+        }
+
+        // === به‌روزرسانی متن select کاستوم ===
+        function updateCustomSelect(selectElement) {
+            const customSelect = selectElement.closest('.custom-select');
+            if (!customSelect) return;
+            
+            const trigger = customSelect.querySelector('.custom-select-trigger span:first-child');
+            const options = customSelect.querySelectorAll('.custom-option');
+            
+            // به‌روزرسانی متن نمایشی
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            if (selectedOption) {
+                trigger.textContent = selectedOption.textContent;
+            }
+            
+            // به‌روزرسانی کلاس selected
+            options.forEach(option => {
+                option.classList.remove('selected');
+                if (option.getAttribute('data-value') === selectElement.value) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        // === رویدادها ===
+        document.addEventListener('DOMContentLoaded', () => {
+            // تنظیم تاریخ پیش‌فرض
+            const dateInput = document.getElementById('reportDate');
+            if (dateInput) {
+                dateInput.value = getPersianDate();
+            }
+            
+            // رندر برنامه اولیه
+            renderSchedule();
+            
+            // تنظیم بخش شخصی‌سازی مشاوران
+            setupCustomizationModal();
+            setupAddBookModal();
+            setupFileNameDialog();
+            setupCustomSelects();
+            setupImportModal();
+            
+            // اضافه کردن event listener برای تغییر پایه تحصیلی
+            const studentGradeSelect = document.getElementById('studentGrade');
+            if (studentGradeSelect) {
+                studentGradeSelect.addEventListener('change', toggleStudentField);
+            }
+            
+            // اضافه کردن event listener برای دکمه دانلود HTML
+            const downloadBtn = document.getElementById('downloadHtmlBtn');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', () => {
+                    const data = collectFormData();
+                    const studentName = data.student.name || 'دانش‌آموز';
+                    const reportDate = data.program.date || getPersianDate();
+                    const defaultName = `برنامه-${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی'}-${studentName}-${reportDate}`;
+                    
+                    showFileNameDialog(defaultName, (fileName) => {
+                        downloadHTMLDirectly(fileName);
+                    });
+                });
+            }
+            
+            // اضافه کردن event listener برای دکمه پیش‌نمایش
+            const previewBtn = document.getElementById('previewBtn');
+            if (previewBtn) {
+                previewBtn.addEventListener('click', previewHTML);
+            }
+            
+            // بستن پیش‌نمایش
+            const closePreview = document.getElementById('closePreview');
+            if (closePreview) {
+                closePreview.addEventListener('click', () => {
+                    document.getElementById('previewContainer').classList.remove('active');
+                });
+            }
+            
+            // بستن مودال با کلیک روی پس‌زمینه
+            const importModal = document.getElementById('importModal');
+            if (importModal) {
+                importModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                    }
+                });
+            }
+            
+            const fileNameModal = document.getElementById('fileNameModal');
+            if (fileNameModal) {
+                fileNameModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                        currentFileNameCallback = null;
+                    }
+                });
+            }
+            
+            const addBookModal = document.getElementById('addBookModal');
+            if (addBookModal) {
+                addBookModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                    }
+                });
+            }
+            
+            const customizationModal = document.getElementById('customizationModal');
+            if (customizationModal) {
+                customizationModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                    }
+                });
+            }
+            
+            const previewContainer = document.getElementById('previewContainer');
+            if (previewContainer) {
+                previewContainer.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
