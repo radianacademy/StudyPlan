@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ که <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -530,7 +530,7 @@
         /* === بخش روتین شبانه === */
         .night-routine-section {
             padding: 30px;
-            background-color: var(--lighter-blue);
+            background-color: var(--light-blue);
             border-top: 1px solid var(--border-color);
         }
 
@@ -640,7 +640,7 @@
             border-radius: var(--border-radius);
             padding: 40px 20px;
             text-align: center;
-            background-color: var(--lighter-blue);
+            background-color: var(--light-blue);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
@@ -872,7 +872,8 @@
 
         /* === استایل‌های فیلدهای داخل پارت مطالعاتی === */
         .study-part-details input,
-        .study-part-details select {
+        .study-part-details select,
+        .study-part-details textarea {
             width: 100%;
             padding: 8px 12px;
             border: 1px solid var(--border-color);
@@ -882,8 +883,17 @@
             transition: var(--transition);
         }
 
+        /* تغییر برای فیلد مبحث - اجازه خطوط چندگانه */
+        .study-part-details textarea.topic-input {
+            min-height: 60px;
+            resize: vertical;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+
         .study-part-details input:focus,
-        .study-part-details select:focus {
+        .study-part-details select:focus,
+        .study-part-details textarea:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
             outline: none;
@@ -1037,6 +1047,56 @@
             outline: none;
         }
 
+        /* === استایل‌های دیالوگ انتخاب رنگ === */
+        .color-picker-dialog {
+            text-align: center;
+        }
+
+        .color-picker-dialog .material-icons {
+            font-size: 48px;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .color-picker-dialog h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .color-picker-dialog p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .color-swatch {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: var(--transition);
+            margin: 0 auto;
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-swatch.selected {
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+
         /* === استایل‌های دیالوگ انتخاب شخصی‌سازی === */
         .customization-dialog {
             text-align: center;
@@ -1116,6 +1176,34 @@
 
         .customization-option-badge.special {
             background-color: var(--warning-color);
+        }
+
+        /* استایل برای دکمه‌های جابجایی پارت */
+        .move-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+            position: relative;
+            z-index: 10;
+        }
+
+        .move-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--accent-color);
+        }
+
+        .move-btn.disabled {
+            color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        .move-btn.disabled:hover {
+            background-color: transparent;
+            color: var(--border-color);
         }
     </style>
 </head>
@@ -1344,6 +1432,30 @@
         </div>
     </div>
 
+    <!-- مودال انتخاب رنگ کتاب -->
+    <div class="modal" id="colorPickerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">انتخاب رنگ کتاب</h3>
+                <button class="modal-close" id="closeColorPickerModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="color-picker-dialog">
+                    <span class="material-icons">palette</span>
+                    <h3>رنگ مورد نظر را انتخاب کنید</h3>
+                    <p>لطفاً رنگی را برای کتاب "<span id="bookNameInColorModal"></span>" انتخاب نمایید</p>
+                    <div class="color-palette" id="colorPalette">
+                        <!-- رنگ‌ها با جاوااسکریپت اضافه می‌شوند -->
+                    </div>
+                    <div class="dialog-actions">
+                        <button class="dialog-btn dialog-btn-primary" id="confirmColorSelection">تایید</button>
+                        <button class="dialog-btn dialog-btn-secondary" id="cancelColorSelection">انصراف</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- مودال وارد کردن HTML -->
     <div class="modal" id="importModal">
         <div class="modal-content">
@@ -1450,6 +1562,16 @@
         // === متغیرهای سراسری ===
         let currentFileNameCallback = null;
         let currentCounselorType = 'standard'; // 'standard' یا 'alireza-torkamani'
+        let bookColors = {}; // برای ذخیره رنگ‌های کتاب‌ها
+        let pendingBookName = ''; // نام کتابی که در انتظار انتخاب رنگ است
+        let selectedColor = '#3182ce'; // رنگ انتخاب شده
+
+        // لیست رنگ‌های پیش‌فرض
+        const defaultColors = [
+            '#e53e3e', '#dd6b20', '#d69e2e', '#38a169', '#3182ce', '#5a67d8',
+            '#805ad5', '#d53f8c', '#ed8936', '#ecc94b', '#48bb78', '#4299e1',
+            '#667eea', '#9f7aea', '#ed64a6', '#fc8181', '#f6ad55', '#f6e05e'
+        ];
 
         // === توابع کمکی ===
         function getPersianDate() {
@@ -1550,15 +1672,20 @@
         }
 
         // === تولید HTML برای کتاب (حالت علیرضا ترکمانی) ===
-        function createBookCardHTML(bookName, bookIndex) {
-            const bookColors = [
+        function createBookCardHTML(bookName, bookIndex, bookColor = null) {
+            // اگر رنگی مشخص نشده باشد، از رنگ پیش‌فرض استفاده می‌کنیم
+            const defaultBookColors = [
                 '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
             ];
-            const colorIndex = bookIndex % bookColors.length;
+            const colorIndex = bookIndex % defaultBookColors.length;
+            const finalColor = bookColor || defaultBookColors[colorIndex];
+            
+            // ذخیره رنگ کتاب
+            bookColors[bookName] = finalColor;
 
             return `
-                <div class="day-card" data-book="${bookName}">
-                    <div class="day-header" style="background-color: ${bookColors[colorIndex]};">
+                <div class="day-card" data-book="${bookName}" data-color="${finalColor}">
+                    <div class="day-header" style="background-color: ${finalColor};">
                         <button class="delete-btn" onclick="deleteBook('${bookName}')">
                             <span class="material-icons">delete</span>
                         </button>
@@ -1586,15 +1713,21 @@
         }
 
         // === تولید HTML برای پارت مطالعاتی ===
-        function createStudyPartHTML(book = '', topic = '', count = '', type = 'test') {
+        function createStudyPartHTML(book = '', topic = '', count = '', type = 'test', color = null) {
             const id = Date.now() + Math.floor(Math.random() * 1000);
             const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
 
             return `
-                <div class="study-part" data-id="${id}">
+                <div class="study-part" data-id="${id}" ${color ? `data-color="${color}"` : ''}>
                     <div class="study-part-header">
                         <div class="study-part-title">پارت مطالعاتی</div>
                         <div class="study-part-actions">
+                            <button class="move-btn" onclick="movePartUp(${id})" title="بالا بردن">
+                                <span class="material-icons">keyboard_arrow_up</span>
+                            </button>
+                            <button class="move-btn" onclick="movePartDown(${id})" title="پایین بردن">
+                                <span class="material-icons">keyboard_arrow_down</span>
+                            </button>
                             <button class="icon-btn" onclick="removeStudyPart(${id})">
                                 <span class="material-icons">delete</span>
                             </button>
@@ -1610,7 +1743,7 @@
                         <div class="detail-item">
                             <div class="detail-label">مبحث/فصل</div>
                             <div class="detail-value">
-                                <input type="text" value="${topic}" placeholder="مبحث یا فصل">
+                                <textarea class="topic-input" placeholder="مبحث یا فصل">${topic}</textarea>
                             </div>
                         </div>
                         <div class="detail-item">
@@ -1644,15 +1777,21 @@
         }
 
         // === تولید HTML برای مبحث کتاب (حالت علیرضا ترکمانی) ===
-        function createBookPartHTML(topic = '', count = '', type = 'test') {
+        function createBookPartHTML(topic = '', count = '', type = 'test', bookColor = null) {
             const id = Date.now() + Math.floor(Math.random() * 1000);
             const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
 
             return `
-                <div class="study-part" data-id="${id}">
+                <div class="study-part" data-id="${id}" ${bookColor ? `data-color="${bookColor}"` : ''}>
                     <div class="study-part-header">
                         <div class="study-part-title">مبحث مطالعاتی</div>
                         <div class="study-part-actions">
+                            <button class="move-btn" onclick="movePartUp(${id})" title="بالا بردن">
+                                <span class="material-icons">keyboard_arrow_up</span>
+                            </button>
+                            <button class="move-btn" onclick="movePartDown(${id})" title="پایین بردن">
+                                <span class="material-icons">keyboard_arrow_down</span>
+                            </button>
                             <button class="icon-btn" onclick="removeStudyPart(${id})">
                                 <span class="material-icons">delete</span>
                             </button>
@@ -1662,7 +1801,7 @@
                         <div class="detail-item">
                             <div class="detail-label">مبحث/فصل</div>
                             <div class="detail-value">
-                                <input type="text" value="${topic}" placeholder="مبحث یا فصل">
+                                <textarea class="topic-input" placeholder="مبحث یا فصل">${topic}</textarea>
                             </div>
                         </div>
                         <div class="detail-item">
@@ -1708,7 +1847,8 @@
         function addBookPart(bookName) {
             const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
             const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
-            studyPartsContainer.insertAdjacentHTML('beforeend', createBookPartHTML());
+            const bookColor = bookCard.dataset.color || '#3182ce';
+            studyPartsContainer.insertAdjacentHTML('beforeend', createBookPartHTML('', '', 'test', bookColor));
             
             // تنظیم مجدد رویدادها برای select های جدید
             setupCustomSelects();
@@ -1718,6 +1858,35 @@
             const studyPart = document.querySelector(`.study-part[data-id="${id}"]`);
             if (studyPart) {
                 studyPart.remove();
+            }
+        }
+
+        // توابع جابجایی پارت‌ها
+        function movePartUp(id) {
+            const part = document.querySelector(`.study-part[data-id="${id}"]`);
+            if (!part) return;
+            
+            const container = part.parentElement;
+            const parts = Array.from(container.querySelectorAll('.study-part'));
+            const index = parts.indexOf(part);
+            
+            if (index > 0) {
+                const prevPart = parts[index - 1];
+                container.insertBefore(part, prevPart);
+            }
+        }
+
+        function movePartDown(id) {
+            const part = document.querySelector(`.study-part[data-id="${id}"]`);
+            if (!part) return;
+            
+            const container = part.parentElement;
+            const parts = Array.from(container.querySelectorAll('.study-part'));
+            const index = parts.indexOf(part);
+            
+            if (index < parts.length - 1) {
+                const nextPart = parts[index + 1];
+                container.insertBefore(nextPart, part);
             }
         }
 
@@ -1799,11 +1968,12 @@
                         const studyParts = [];
                         dayCard.querySelectorAll(`.study-parts[data-period="${period}"] .study-part`).forEach(part => {
                             const inputs = part.querySelectorAll('input');
+                            const textarea = part.querySelector('textarea.topic-input');
                             const select = part.querySelector('.original-select');
                             studyParts.push({
                                 book: inputs[0].value,
-                                topic: inputs[1].value,
-                                count: inputs[2].value,
+                                topic: textarea ? textarea.value : '',
+                                count: inputs[1].value,
                                 type: select ? select.value : 'test'
                             });
                         });
@@ -1816,17 +1986,20 @@
                 // جمع‌آوری اطلاعات کتاب‌ها
                 document.querySelectorAll('.day-card[data-book]').forEach(bookCard => {
                     const bookName = bookCard.dataset.book;
+                    const bookColor = bookCard.dataset.color || '#3182ce';
                     const bookData = {
+                        color: bookColor,
                         parts: [],
                         notes: bookCard.querySelector('.day-notes-content').value
                     };
 
                     bookCard.querySelectorAll(`.study-parts[data-book="${bookName}"] .study-part`).forEach(part => {
                         const inputs = part.querySelectorAll('input');
+                        const textarea = part.querySelector('textarea.topic-input');
                         const select = part.querySelector('.original-select');
                         bookData.parts.push({
-                            topic: inputs[0].value,
-                            count: inputs[1].value,
+                            topic: textarea ? textarea.value : '',
+                            count: inputs[0].value,
                             type: select ? select.value : 'test'
                         });
                     });
@@ -1906,7 +2079,8 @@
                 // رندر کردن کتاب‌های موجود
                 const daysContainer = document.getElementById('daysContainer');
                 Object.keys(data.books).forEach((bookName, index) => {
-                    daysContainer.insertAdjacentHTML('beforeend', createBookCardHTML(bookName, index));
+                    const bookColor = data.books[bookName].color || null;
+                    daysContainer.insertAdjacentHTML('beforeend', createBookCardHTML(bookName, index, bookColor));
                 });
                 
                 // بارگذاری اطلاعات کتاب‌ها
@@ -1922,9 +2096,10 @@
                         studyPartsContainer.innerHTML = '';
 
                         if (data.books[bookName].parts) {
+                            const bookColor = data.books[bookName].color || '#3182ce';
                             data.books[bookName].parts.forEach(part => {
                                 studyPartsContainer.insertAdjacentHTML('beforeend', 
-                                    createBookPartHTML(part.topic, part.count, part.type)
+                                    createBookPartHTML(part.topic, part.count, part.type, bookColor)
                                 );
                             });
                         }
@@ -2167,7 +2342,7 @@
                         text-align: center;
                         border-bottom: 1px solid #e2e8f0;
                         font-size: 14px;
-                        vertical-align: top; /* تغییر از middle به top */
+                        vertical-align: top;
                     }
                     .pdf-table tr:nth-child(even) {
                         background-color: #f8fafc;
@@ -2178,12 +2353,12 @@
                         color: #2d3748;
                     }
                     .pdf-subject {
-                        display: inline-block;
+                        display: block;
+                        margin-bottom: 8px;
                         padding: 6px 12px;
                         border-radius: 20px;
                         font-size: 12px;
                         font-weight: 500;
-                        margin: 2px;
                     }
                     .pdf-subject-math {
                         background-color: rgba(233, 30, 99, 0.15);
@@ -2335,9 +2510,19 @@
                                         return parts.map(part => {
                                             const colorClass = getSubjectColor(part.book);
                                             const typeText = part.type === 'test' ? 'تست' : 'تشریحی';
-                                            const text = part.book ? `${part.book} - ${part.topic || ''} (${part.count || ''} ${typeText})` : '---';
-                                            return `<span class="pdf-subject pdf-subject-${colorClass}">${text}</span>`;
-                                        }).join('<br>');
+                                            // نمایش کتاب در خط اول، مبحث در خط وسط و تعداد در خط آخر
+                                            const bookLine = part.book || '---';
+                                            const topicLines = part.topic ? part.topic.split('\n').map(line => `<div>${line}</div>`).join('') : '';
+                                            const countLine = part.count ? `${part.count} ${typeText}` : '';
+                                            
+                                            return `
+                                                <div class="pdf-subject pdf-subject-${colorClass}">
+                                                    <div>${bookLine}</div>
+                                                    ${topicLines}
+                                                    ${countLine ? `<div>${countLine}</div>` : ''}
+                                                </div>
+                                            `;
+                                        }).join('');
                                     };
 
                                     return `
@@ -2374,15 +2559,24 @@
                                         <td class="pdf-day-cell">${data.program.dateRange || '---'}</td>
                                         ${bookNames.map(bookName => {
                                             const bookParts = data.books[bookName]?.parts || [];
+                                            const bookColor = data.books[bookName]?.color || '#3182ce';
                                             const renderParts = (parts) => {
                                                 if (parts.length === 0) {
                                                     return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
                                                 }
                                                 return parts.map(part => {
                                                     const typeText = part.type === 'test' ? 'تست' : 'تشریحی';
-                                                    const text = part.topic ? `${part.topic} (${part.count || ''} ${typeText})` : '---';
-                                                    return `<span class="pdf-subject pdf-subject-${getSubjectColor(bookName)}">${text}</span>`;
-                                                }).join('<br>');
+                                                    // نمایش مبحث در خط اول و تعداد در خط آخر
+                                                    const topicLines = part.topic ? part.topic.split('\n').map(line => `<div>${line}</div>`).join('') : '';
+                                                    const countLine = part.count ? `${part.count} ${typeText}` : '';
+                                                    
+                                                    return `
+                                                        <div class="pdf-subject" style="background-color: ${bookColor}20; color: ${bookColor};">
+                                                            ${topicLines}
+                                                            ${countLine ? `<div>${countLine}</div>` : ''}
+                                                        </div>
+                                                    `;
+                                                }).join('');
                                             };
                                             return `<td>${renderParts(bookParts)}</td>`;
                                         }).join('')}
@@ -2735,16 +2929,35 @@
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = html;
                             
-                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
-                            subjectSpans.forEach(span => {
-                                const text = span.textContent.trim();
-                                // فرمت: "مبحث (تعداد نوع)"
-                                const match = text.match(/^(.+?)\s*\((\d+)\s*(.+?)\)$/);
-                                if (match) {
+                            const subjectDivs = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectDivs.forEach(div => {
+                                const divs = div.querySelectorAll('div');
+                                if (divs.length > 0) {
+                                    // جمع‌آوری تمام div ها به جز آخرین (که تعداد است) به عنوان مبحث
+                                    let topic = '';
+                                    for(let i = 0; i < divs.length - 1; i++) {
+                                        topic += divs[i].textContent.trim() + '\n';
+                                    }
+                                    topic = topic.trim();
+
+                                    const countText = divs.length > 0 ? divs[divs.length - 1].textContent.trim() : '';
+                                    
+                                    // استخراج نوع و تعداد از رشته تعداد
+                                    let type = 'test';
+                                    let countValue = '';
+                                    
+                                    if (countText) {
+                                        const match = countText.match(/(\d+)\s*(.+)$/);
+                                        if (match) {
+                                            countValue = match[1].trim();
+                                            type = match[2].trim() === 'تست' ? 'test' : 'descriptive';
+                                        }
+                                    }
+                                    
                                     parts.push({
-                                        topic: match[1].trim(),
-                                        count: match[2].trim(),
-                                        type: match[3].trim() === 'تست' ? 'test' : 'descriptive'
+                                        topic: topic,
+                                        count: countValue,
+                                        type: type
                                     });
                                 }
                             });
@@ -2752,7 +2965,24 @@
                             return parts;
                         };
                         
+                        // استخراج رنگ کتاب از استایل
+                        const firstSubject = tempDiv.querySelector('.pdf-subject');
+                        let bookColor = '#3182ce'; // رنگ پیش‌فرض
+                        
+                        if (firstSubject && firstSubject.style.backgroundColor) {
+                            // تبدیل rgba به hex
+                            const rgba = firstSubject.style.backgroundColor;
+                            const match = rgba.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+                            if (match) {
+                                const r = parseInt(match[1]).toString(16).padStart(2, '0');
+                                const g = parseInt(match[2]).toString(16).padStart(2, '0');
+                                const b = parseInt(match[3]).toString(16).padStart(2, '0');
+                                bookColor = `#${r}${g}${b}`;
+                            }
+                        }
+                        
                         data.books[bookName] = {
+                            color: bookColor,
                             parts: extractParts(partsHTML),
                             notes: ''
                         };
@@ -2786,17 +3016,38 @@
                             const tempDiv = document.createElement('div');
                             tempDiv.innerHTML = html;
                             
-                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
-                            subjectSpans.forEach(span => {
-                                const text = span.textContent.trim();
-                                // فرمت: "کتاب - مبحث (تعداد نوع)"
-                                const match = text.match(/^(.+?)\s*-\s*(.+?)\s*\((\d+)\s*(.+?)\)$/);
-                                if (match) {
+                            const subjectDivs = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectDivs.forEach(div => {
+                                const divs = div.querySelectorAll('div');
+                                if (divs.length > 0) {
+                                    const book = divs[0].textContent.trim();
+                                    
+                                    // جمع‌آوری div های میانی به عنوان مبحث
+                                    let topic = '';
+                                    for(let i = 1; i < divs.length - 1; i++) {
+                                        topic += divs[i].textContent.trim() + '\n';
+                                    }
+                                    topic = topic.trim();
+
+                                    const countText = divs.length > 0 ? divs[divs.length - 1].textContent.trim() : '';
+                                    
+                                    // استخراج نوع و تعداد از رشته تعداد
+                                    let type = 'test';
+                                    let countValue = '';
+                                    
+                                    if (countText) {
+                                        const match = countText.match(/(\d+)\s*(.+)$/);
+                                        if (match) {
+                                            countValue = match[1].trim();
+                                            type = match[2].trim() === 'تست' ? 'test' : 'descriptive';
+                                        }
+                                    }
+                                    
                                     parts.push({
-                                        book: match[1].trim(),
-                                        topic: match[2].trim(),
-                                        count: match[3].trim(),
-                                        type: match[4].trim() === 'تست' ? 'test' : 'descriptive'
+                                        book: book,
+                                        topic: topic,
+                                        count: countValue,
+                                        type: type
                                     });
                                 }
                             });
@@ -2941,9 +3192,9 @@
                 confirmBtn.addEventListener('click', () => {
                     const bookName = input.value.trim();
                     if (bookName) {
-                        addNewBook(bookName);
+                        pendingBookName = bookName;
                         modal.classList.remove('active');
-                        input.value = '';
+                        showColorPickerModal();
                     } else {
                         showToast('لطفاً نام کتاب را وارد کنید', 'error');
                     }
@@ -2956,6 +3207,62 @@
                     confirmBtn.click();
                 }
             });
+            
+            // Esc برای انصراف
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) {
+                    cancelBtn.click();
+                }
+            });
+        }
+
+        // === تنظیم دیالوگ انتخاب رنگ ===
+        function setupColorPickerModal() {
+            const modal = document.getElementById('colorPickerModal');
+            const closeBtn = document.getElementById('closeColorPickerModal');
+            const confirmBtn = document.getElementById('confirmColorSelection');
+            const cancelBtn = document.getElementById('cancelColorSelection');
+            const palette = document.getElementById('colorPalette');
+            
+            // ایجاد پالت رنگ
+            palette.innerHTML = '';
+            defaultColors.forEach(color => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch';
+                swatch.style.backgroundColor = color;
+                swatch.dataset.color = color;
+                if (color === selectedColor) {
+                    swatch.classList.add('selected');
+                }
+                swatch.addEventListener('click', () => {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('selected'));
+                    swatch.classList.add('selected');
+                    selectedColor = color;
+                });
+                palette.appendChild(swatch);
+            });
+
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                });
+            }
+            
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', () => {
+                    if (pendingBookName) {
+                        addNewBook(pendingBookName, selectedColor);
+                        modal.classList.remove('active');
+                        pendingBookName = '';
+                    }
+                });
+            }
             
             // Esc برای انصراف
             document.addEventListener('keydown', (e) => {
@@ -3041,14 +3348,23 @@
             }, 100);
         }
 
+        // === تابع برای نمایش دیالوگ انتخاب رنگ ===
+        function showColorPickerModal() {
+            const modal = document.getElementById('colorPickerModal');
+            const bookNameSpan = document.getElementById('bookNameInColorModal');
+            
+            bookNameSpan.textContent = pendingBookName;
+            modal.classList.add('active');
+        }
+
         // === تابع برای افزودن کتاب جدید ===
-        function addNewBook(bookName) {
+        function addNewBook(bookName, bookColor = null) {
             const daysContainer = document.getElementById('daysContainer');
             const existingBooks = daysContainer.querySelectorAll('.day-card[data-book]');
             const bookIndex = existingBooks.length;
             
-            // ایجاد کارت کتاب جدید
-            const bookCardHTML = createBookCardHTML(bookName, bookIndex);
+            // ایجاد کارت کتاب جدید با رنگ مشخص شده
+            const bookCardHTML = createBookCardHTML(bookName, bookIndex, bookColor);
             
             // پیدا کردن دکمه افزودن کتاب و اضافه کردن کارت قبل از آن
             const addBookBtn = daysContainer.querySelector('.btn-primary');
@@ -3065,7 +3381,7 @@
             const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
             if (bookCard) {
                 bookCard.remove();
-                showToast(`کتاب "${bookName}" حذف شد`, 'warning');
+                                showToast(`کتاب "${bookName}" حذف شد`, 'warning');
             }
         }
 
@@ -3169,6 +3485,7 @@
             // تنظیم بخش شخصی‌سازی مشاوران
             setupCustomizationModal();
             setupAddBookModal();
+            setupColorPickerModal();
             setupFileNameDialog();
             setupCustomSelects();
             setupImportModal();
@@ -3231,6 +3548,15 @@
             const addBookModal = document.getElementById('addBookModal');
             if (addBookModal) {
                 addBookModal.addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) {
+                        e.currentTarget.classList.remove('active');
+                    }
+                });
+            }
+
+            const colorPickerModal = document.getElementById('colorPickerModal');
+            if (colorPickerModal) {
+                colorPickerModal.addEventListener('click', (e) => {
                     if (e.target === e.currentTarget) {
                         e.currentTarget.classList.remove('active');
                     }
