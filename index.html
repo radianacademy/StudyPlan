@@ -653,7 +653,7 @@
             border-radius: var(--border-radius);
             padding: 40px 20px;
             text-align: center;
-            background-color: var(--lighter-blue);
+            background-color: var(--light-blue);
             cursor: pointer;
             transition: var(--transition);
             position: relative;
@@ -1253,6 +1253,7 @@
                                 <option value="دهم">دهم</option>
                                 <option value="یازدهم">یازدهم</option>
                                 <option value="دوازدهم">دوازدهم</option>
+                                <option value="فارغ التحصیل">فارغ التحصیل</option>
                             </select>
                             <div class="custom-select-trigger">
                                 <span>پایه را انتخاب کنید</span>
@@ -1266,6 +1267,7 @@
                                 <div class="custom-option" data-value="دهم">دهم</div>
                                 <div class="custom-option" data-value="یازدهم">یازدهم</div>
                                 <div class="custom-option" data-value="دوازدهم">دوازدهم</div>
+                                <div class="custom-option" data-value="فارغ التحصیل">فارغ التحصیل</div>
                             </div>
                         </div>
                     </div>
@@ -1706,7 +1708,7 @@
                         <div class="detail-item">
                             <div class="detail-label">مبحث/فصل</div>
                             <div class="detail-value">
-                                <textarea placeholder="مبحث یا فصل (قابل ویرایش چندخطی)">${topic}</textarea>
+                                <textarea placeholder="مبحث یا فصل (قابل ویرایش چندخطی)" rows="4">${topic}</textarea>
                             </div>
                         </div>
                         <div class="detail-item">
@@ -1740,9 +1742,15 @@
         }
 
         // === تولید HTML برای مبحث کتاب (حالت علیرضا ترکمانی - با قابلیت چندخطی برای مبحث) ===
-        function createBookPartHTML(topic = '', count = '', type = 'test', color = '#3182ce') {
+        function createBookPartHTML(topic = '', count = '', type = 'educational-test', color = '#3182ce') {
             const id = Date.now() + Math.floor(Math.random() * 1000);
-            const typeLabel = type === 'test' ? 'تست' : 'تشریحی';
+            let typeLabel = 'تست آموزشی';
+            
+            if (type === 'assessment-test') {
+                typeLabel = 'تست سنجشی';
+            } else if (type === 'descriptive') {
+                typeLabel = 'تشریحی';
+            }
 
             return `
                 <div class="study-part" data-id="${id}" style="border-right-color: ${color};">
@@ -1764,7 +1772,7 @@
                         <div class="detail-item">
                             <div class="detail-label">مبحث/فصل</div>
                             <div class="detail-value">
-                                <textarea placeholder="مبحث یا فصل (قابل ویرایش چندخطی)">${topic}</textarea>
+                                <textarea placeholder="مبحث یا فصل (قابل ویرایش چندخطی)" rows="4">${topic}</textarea>
                             </div>
                         </div>
                         <div class="detail-item">
@@ -1778,7 +1786,8 @@
                             <div class="detail-value">
                                 <div class="custom-select">
                                     <select class="original-select">
-                                        <option value="test" ${type === 'test' ? 'selected' : ''}>تست</option>
+                                        <option value="educational-test" ${type === 'educational-test' ? 'selected' : ''}>تست آموزشی</option>
+                                        <option value="assessment-test" ${type === 'assessment-test' ? 'selected' : ''}>تست سنجشی</option>
                                         <option value="descriptive" ${type === 'descriptive' ? 'selected' : ''}>تشریحی</option>
                                     </select>
                                     <div class="custom-select-trigger">
@@ -1786,7 +1795,8 @@
                                         <span class="material-icons">keyboard_arrow_down</span>
                                     </div>
                                     <div class="custom-options">
-                                        <div class="custom-option" data-value="test">تست</div>
+                                        <div class="custom-option" data-value="educational-test">تست آموزشی</div>
+                                        <div class="custom-option" data-value="assessment-test">تست سنجشی</div>
                                         <div class="custom-option" data-value="descriptive">تشریحی</div>
                                     </div>
                                 </div>
@@ -1811,7 +1821,7 @@
             const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
             const bookColor = bookCard.dataset.color || '#3182ce';
             const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
-            studyPartsContainer.insertAdjacentHTML('beforeend', createBookPartHTML('', '', 'test', bookColor));
+            studyPartsContainer.insertAdjacentHTML('beforeend', createBookPartHTML('', '', 'educational-test', bookColor));
             
             // تنظیم مجدد رویدادها برای select های جدید
             setupCustomSelects();
@@ -1844,42 +1854,42 @@
         }
 
         // === تابع اصلی برای رندر کردن برنامه ===
-function renderSchedule() {
-    const daysContainer = document.getElementById('daysContainer');
-    const scheduleTitle = document.getElementById('scheduleTitle');
-    
-    daysContainer.innerHTML = '';
-    
-    if (currentCounselorType === 'standard') {
-        // حالت استاندارد - بر اساس روزهای هفته
-        scheduleTitle.innerHTML = `
-            <span class="material-icons">view_week</span>
-            برنامه هفتگی مطالعه
-        `;
-        
-        const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
-        days.forEach((day, index) => {
-            daysContainer.insertAdjacentHTML('beforeend', createDayCardHTML(day, index));
-        });
-    } else if (currentCounselorType === 'alireza-torkamani') {
-        // حالت علیرضا ترکمانی - بر اساس کتاب‌ها
-        scheduleTitle.innerHTML = `
-            <span class="material-icons">auto_stories</span>
-            برنامه مطالعاتی بر اساس کتاب‌ها
-        `;
-        
-        // اضافه کردن دکمه افزودن کتاب در انتهای کانتینر
-        daysContainer.insertAdjacentHTML('beforeend', `
-            <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
-                <span class="material-icons">add_circle</span>
-                افزودن کتاب جدید
-            </button>
-        `);
-    }
-    
-    // تنظیم مجدد select های کاستوم
-    setupCustomSelects();
-}
+        function renderSchedule() {
+            const daysContainer = document.getElementById('daysContainer');
+            const scheduleTitle = document.getElementById('scheduleTitle');
+            
+            daysContainer.innerHTML = '';
+            
+            if (currentCounselorType === 'standard') {
+                // حالت استاندارد - بر اساس روزهای هفته
+                scheduleTitle.innerHTML = `
+                    <span class="material-icons">view_week</span>
+                    برنامه هفتگی مطالعه
+                `;
+                
+                const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"];
+                days.forEach((day, index) => {
+                    daysContainer.insertAdjacentHTML('beforeend', createDayCardHTML(day, index));
+                });
+            } else if (currentCounselorType === 'alireza-torkamani') {
+                // حالت علیرضا ترکمانی - بر اساس کتاب‌ها
+                scheduleTitle.innerHTML = `
+                    <span class="material-icons">auto_stories</span>
+                    برنامه مطالعاتی بر اساس کتاب‌ها
+                `;
+                
+                // اضافه کردن دکمه افزودن کتاب در انتهای کانتینر
+                daysContainer.insertAdjacentHTML('beforeend', `
+                    <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
+                        <span class="material-icons">add_circle</span>
+                        افزودن کتاب جدید
+                    </button>
+                `);
+            }
+            
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
+        }
 
         // === جمع‌آوری داده‌ها از فرم ===
         function collectFormData() {
@@ -1953,7 +1963,7 @@ function renderSchedule() {
                         bookData.parts.push({
                             topic: textarea ? textarea.value : '',
                             count: inputs[0].value,
-                            type: select ? select.value : 'test'
+                            type: select ? select.value : 'educational-test'
                         });
                     });
 
@@ -1965,123 +1975,123 @@ function renderSchedule() {
         }
 
         // === بارگذاری داده‌ها در فرم ===
-function loadFormData(data) {
-    // تغییر نوع مشاور اگر در داده‌ها مشخص شده باشد
-    if (data.counselorType) {
-        switchCounselorType(data.counselorType, false);
-    }
+        function loadFormData(data) {
+            // تغییر نوع مشاور اگر در داده‌ها مشخص شده باشد
+            if (data.counselorType) {
+                switchCounselorType(data.counselorType, false);
+            }
 
-    // بارگذاری اطلاعات مشاور
-    document.getElementById('counselorName').value = data.counselor?.name || '';
-    document.getElementById('counselorContact').value = data.counselor?.contact || '';
+            // بارگذاری اطلاعات مشاور
+            document.getElementById('counselorName').value = data.counselor?.name || '';
+            document.getElementById('counselorContact').value = data.counselor?.contact || '';
 
-    // بارگذاری اطلاعات دانش‌آموز
-    document.getElementById('studentName').value = data.student?.name || '';
-    
-    // بارگذاری پایه تحصیلی
-    const studentGradeSelect = document.getElementById('studentGrade');
-    studentGradeSelect.value = data.student?.grade || '';
-    updateCustomSelect(studentGradeSelect);
-    
-    // بارگذاری رشته تحصیلی
-    document.getElementById('studentField').value = data.student?.field || '';
-    updateCustomSelect(document.getElementById('studentField'));
-    
-    // بررسی و نمایش/مخفی کردن فیلد رشته تحصیلی
-    toggleStudentField();
+            // بارگذاری اطلاعات دانش‌آموز
+            document.getElementById('studentName').value = data.student?.name || '';
+            
+            // بارگذاری پایه تحصیلی
+            const studentGradeSelect = document.getElementById('studentGrade');
+            studentGradeSelect.value = data.student?.grade || '';
+            updateCustomSelect(studentGradeSelect);
+            
+            // بارگذاری رشته تحصیلی
+            document.getElementById('studentField').value = data.student?.field || '';
+            updateCustomSelect(document.getElementById('studentField'));
+            
+            // بررسی و نمایش/مخفی کردن فیلد رشته تحصیلی
+            toggleStudentField();
 
-    // بارگذاری اطلاعات برنامه
-    document.getElementById('reportDate').value = data.program?.date || getPersianDate();
-    
-    if (currentCounselorType === 'standard') {
-        document.getElementById('weekNumber').value = data.program?.weekNumber || '';
-    } else if (currentCounselorType === 'alireza-torkamani') {
-        document.getElementById('dateRange').value = data.program?.dateRange || '';
-    }
+            // بارگذاری اطلاعات برنامه
+            document.getElementById('reportDate').value = data.program?.date || getPersianDate();
+            
+            if (currentCounselorType === 'standard') {
+                document.getElementById('weekNumber').value = data.program?.weekNumber || '';
+            } else if (currentCounselorType === 'alireza-torkamani') {
+                document.getElementById('dateRange').value = data.program?.dateRange || '';
+            }
 
-    // بارگذاری روتین شبانه
-    document.getElementById('routineDescription').value = data.routine?.description || '';
-    document.getElementById('sleepTime').value = data.routine?.sleepTime || '';
-    document.getElementById('wakeTime').value = data.routine?.wakeTime || '';
+            // بارگذاری روتین شبانه
+            document.getElementById('routineDescription').value = data.routine?.description || '';
+            document.getElementById('sleepTime').value = data.routine?.sleepTime || '';
+            document.getElementById('wakeTime').value = data.routine?.wakeTime || '';
 
-    // بارگذاری اطلاعات برنامه
-    if (currentCounselorType === 'standard' && data.days) {
-        Object.keys(data.days).forEach(dayName => {
-            const dayCard = document.querySelector(`.day-card[data-day="${dayName}"]`);
-            if (dayCard && data.days[dayName]) {
-                // بارگذاری توضیحات روز
-                dayCard.querySelector('.day-notes-content').value = data.days[dayName].notes || '';
+            // بارگذاری اطلاعات برنامه
+            if (currentCounselorType === 'standard' && data.days) {
+                Object.keys(data.days).forEach(dayName => {
+                    const dayCard = document.querySelector(`.day-card[data-day="${dayName}"]`);
+                    if (dayCard && data.days[dayName]) {
+                        // بارگذاری توضیحات روز
+                        dayCard.querySelector('.day-notes-content').value = data.days[dayName].notes || '';
 
-                // بارگذاری پارت‌های مطالعاتی
-                ['morning', 'afternoon', 'evening'].forEach(period => {
-                    const studyPartsContainer = dayCard.querySelector(`.study-parts[data-period="${period}"]`);
-                    // پاک کردن پارت‌های موجود
-                    studyPartsContainer.innerHTML = '';
+                        // بارگذاری پارت‌های مطالعاتی
+                        ['morning', 'afternoon', 'evening'].forEach(period => {
+                            const studyPartsContainer = dayCard.querySelector(`.study-parts[data-period="${period}"]`);
+                            // پاک کردن پارت‌های موجود
+                            studyPartsContainer.innerHTML = '';
 
-                    if (data.days[dayName].periods && data.days[dayName].periods[period]) {
-                        data.days[dayName].periods[period].forEach(part => {
-                            studyPartsContainer.insertAdjacentHTML('beforeend', 
-                                createStudyPartHTML(part.book, part.topic, part.count, part.type)
-                            );
+                            if (data.days[dayName].periods && data.days[dayName].periods[period]) {
+                                data.days[dayName].periods[period].forEach(part => {
+                                    studyPartsContainer.insertAdjacentHTML('beforeend', 
+                                        createStudyPartHTML(part.book, part.topic, part.count, part.type)
+                                    );
+                                });
+                            }
                         });
                     }
                 });
+            } else if (currentCounselorType === 'alireza-torkamani' && data.books) {
+                const daysContainer = document.getElementById('daysContainer');
+                
+                // ابتدا کانتینر را کاملاً خالی کنیم
+                daysContainer.innerHTML = '';
+                
+                // سپس کتاب‌ها را اضافه کنیم
+                Object.keys(data.books).forEach((bookName, index) => {
+                    const bookColor = data.books[bookName]?.color;
+                    // استفاده از رنگ استخراج شده یا رنگ پیش‌فرض
+                    const finalColor = bookColor || getDefaultBookColor(index);
+                    daysContainer.insertAdjacentHTML('beforeend', createBookCardHTML(bookName, index, finalColor));
+                    
+                    // بارگذاری اطلاعات کتاب
+                    const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
+                    if (bookCard && data.books[bookName]) {
+                        // بارگذاری توضیحات کتاب
+                        bookCard.querySelector('.day-notes-content').value = data.books[bookName].notes || '';
+
+                        // بارگذاری مباحث مطالعاتی
+                        const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
+                        // پاک کردن پارت‌های موجود
+                        studyPartsContainer.innerHTML = '';
+
+                        if (data.books[bookName].parts) {
+                            data.books[bookName].parts.forEach(part => {
+                                studyPartsContainer.insertAdjacentHTML('beforeend', 
+                                    createBookPartHTML(part.topic, part.count, part.type, finalColor)
+                                );
+                            });
+                        }
+                    }
+                });
+                
+                // در انتها دکمه افزودن کتاب جدید را اضافه کنیم
+                daysContainer.insertAdjacentHTML('beforeend', `
+                    <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
+                        <span class="material-icons">add_circle</span>
+                        افزودن کتاب جدید
+                    </button>
+                `);
             }
-        });
-    } else if (currentCounselorType === 'alireza-torkamani' && data.books) {
-        const daysContainer = document.getElementById('daysContainer');
-        
-        // ابتدا کانتینر را کاملاً خالی کنیم
-        daysContainer.innerHTML = '';
-        
-        // سپس کتاب‌ها را اضافه کنیم
-        Object.keys(data.books).forEach((bookName, index) => {
-            const bookColor = data.books[bookName]?.color;
-            // استفاده از رنگ استخراج شده یا رنگ پیش‌فرض
-            const finalColor = bookColor || getDefaultBookColor(index);
-            daysContainer.insertAdjacentHTML('beforeend', createBookCardHTML(bookName, index, finalColor));
             
-            // بارگذاری اطلاعات کتاب
-            const bookCard = document.querySelector(`.day-card[data-book="${bookName}"]`);
-            if (bookCard && data.books[bookName]) {
-                // بارگذاری توضیحات کتاب
-                bookCard.querySelector('.day-notes-content').value = data.books[bookName].notes || '';
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
+        }
 
-                // بارگذاری مباحث مطالعاتی
-                const studyPartsContainer = bookCard.querySelector(`.study-parts[data-book="${bookName}"]`);
-                // پاک کردن پارت‌های موجود
-                studyPartsContainer.innerHTML = '';
-
-                if (data.books[bookName].parts) {
-                    data.books[bookName].parts.forEach(part => {
-                        studyPartsContainer.insertAdjacentHTML('beforeend', 
-                            createBookPartHTML(part.topic, part.count, part.type, finalColor)
-                        );
-                    });
-                }
-            }
-        });
-        
-        // در انتها دکمه افزودن کتاب جدید را اضافه کنیم
-        daysContainer.insertAdjacentHTML('beforeend', `
-            <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
-                <span class="material-icons">add_circle</span>
-                افزودن کتاب جدید
-            </button>
-        `);
-    }
-    
-    // تنظیم مجدد select های کاستوم
-    setupCustomSelects();
-}
-
-// تابع برای دریافت رنگ پیش‌فرض بر اساس ایندکس
-function getDefaultBookColor(index) {
-    const bookColors = [
-        '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
-    ];
-    return bookColors[index % bookColors.length];
-}
+        // تابع برای دریافت رنگ پیش‌فرض بر اساس ایندکس
+        function getDefaultBookColor(index) {
+            const bookColors = [
+                '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
+            ];
+            return bookColors[index % bookColors.length];
+        }
 
         // === تابع برای تغییر نوع مشاور ===
         function switchCounselorType(type, showNotification = true) {
@@ -2127,7 +2137,7 @@ function getDefaultBookColor(index) {
             const studentGrade = document.getElementById('studentGrade').value;
             const studentFieldGroup = document.getElementById('studentFieldGroup');
             
-            if (studentGrade === 'هفتم' || studentGrade === 'هشتم' || studentGrade === 'نهم') {
+            if (studentGrade === 'هفتم' || studentGrade === 'هشتم' || studentGrade === 'نهم' || studentGrade === 'فارغ التحصیل') {
                 studentFieldGroup.style.display = 'none';
             } else {
                 studentFieldGroup.style.display = 'block';
@@ -2152,565 +2162,574 @@ function getDefaultBookColor(index) {
         }
 
         // === تولید محتوای HTML برای خروجی ===
-        // === تولید محتوای HTML برای خروجی ===
-function generateHTMLContent() {
-    const data = collectFormData();
-    
-    // رنگ‌بندی برای دروس
-    const subjectColors = {
-        'ریاضی': 'math',
-        'فیزیک': 'math',
-        'شیمی': 'science',
-        'زیست‌شناسی': 'science',
-        'علوم': 'science',
-        'زبان انگلیسی': 'language',
-        'زبان عربی': 'arabic',
-        'فارسی': 'literature',
-        'ادبیات': 'literature',
-        'تاریخ': 'history',
-        'جغرافیا': 'history',
-        'فلسفه': 'history',
-        'دین و زندگی': 'religion',
-        'قرآن': 'religion',
-        'عربی': 'arabic'
-    };
+        function generateHTMLContent() {
+            const data = collectFormData();
+            
+            // رنگ‌بندی برای دروس
+            const subjectColors = {
+                'ریاضی': 'math',
+                'فیزیک': 'math',
+                'شیمی': 'science',
+                'زیست‌شناسی': 'science',
+                'علوم': 'science',
+                'زبان انگلیسی': 'language',
+                'زبان عربی': 'arabic',
+                'فارسی': 'literature',
+                'ادبیات': 'literature',
+                'تاریخ': 'history',
+                'جغرافیا': 'history',
+                'فلسفه': 'history',
+                'دین و زندگی': 'religion',
+                'قرآن': 'religion',
+                'عربی': 'arabic'
+            };
 
-    // تابع برای تشخیص رنگ درس
-    function getSubjectColor(bookName) {
-        for (const [subject, color] of Object.entries(subjectColors)) {
-            if (bookName.includes(subject)) {
-                return color;
-            }
-        }
-        return 'math'; // رنگ پیش‌فرض
-    }
-
-    // تابع برای فرمت‌بندی متن مبحث (چندخطی)
-    function formatTopicText(book, topic, count, type) {
-        if (!book && !topic) return '';
-        
-        let result = '';
-        
-        // اضافه کردن نام کتاب در سطر اول
-        if (book) {
-            result += book;
-        }
-        
-        // تقسیم متن موضوع به خطوط
-        if (topic) {
-            const lines = topic.split('\n').filter(line => line.trim() !== '');
-            if (lines.length > 0) {
-                if (result) {
-                    result += '\n';
+            // تابع برای تشخیص رنگ درس
+            function getSubjectColor(bookName) {
+                for (const [subject, color] of Object.entries(subjectColors)) {
+                    if (bookName.includes(subject)) {
+                        return color;
+                    }
                 }
-                result += lines.join('\n');
+                return 'math'; // رنگ پیش‌فرض
             }
-        }
-        
-        // اضافه کردن تعداد تست در سطر آخر اگر مشخص شده باشد
-        if (count && count.trim() !== '') {
-            const typeText = type === 'test' ? 'تستی' : 'تشریحی';
-            if (result) {
-                result += '\n';
-            }
-            result += count + ' ' + typeText;
-        }
-        
-        return result;
-    }
 
-    const styles = `
-        <style>
-            @page {
-                size: A4;
-                margin: 20mm;
-            }
-            body {
-                font-family: 'Vazirmatn', sans-serif;
-                direction: rtl;
-                margin: 0;
-                padding: 0;
-                line-height: 1.6;
-            }
-            .pdf-header {
-                background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
-                color: white;
-                padding: 40px;
-                text-align: center;
-                position: relative;
-                overflow: hidden;
-                border-radius: 12px;
-                margin-bottom: 30px;
-            }
-            .pdf-header::before {
-                content: '';
-                position: absolute;
-                top: -50px;
-                right: -50px;
-                width: 200px;
-                height: 200px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.1);
-            }
-            .pdf-header::after {
-                content: '';
-                position: absolute;
-                bottom: -30px;
-                left: -30px;
-                width: 150px;
-                height: 150px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.1);
-            }
-            .pdf-logo-container {
-                display: inline-block;
-                background-color: white;
-                padding: 10px;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                margin-bottom: 20px;
-            }
-            .pdf-logo {
-                max-width: 120px;
-                height: auto;
-                border-radius: 8px;
-                display: block;
-            }
-            .pdf-title {
-                font-size: 36px;
-                font-weight: 800;
-                margin-bottom: 10px;
-                position: relative;
-                z-index: 1;
-            }
-            .pdf-subtitle {
-                font-size: 18px;
-                opacity: 0.9;
-                position: relative;
-                z-index: 1;
-            }
-            .pdf-info {
-                background-color: #f0f7ff;
-                padding: 30px;
-                margin-bottom: 30px;
-                border-radius: 12px;
-                border: 2px solid #e6f2ff;
-            }
-            .pdf-info-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            .pdf-info-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .pdf-info-label {
-                font-weight: 700;
-                color: #1a365d;
-                min-width: 80px;
-            }
-            .pdf-info-value {
-                color: #2d3748;
-                font-weight: 500;
-            }
-            .pdf-schedule {
-                background-color: white;
-                border-radius: 12px;
-                overflow: hidden;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                margin-bottom: 30px;
-            }
-            .pdf-schedule-header {
-                background-color: #3182ce;
-                color: white;
-                padding: 20px;
-                text-align: center;
-            }
-            .pdf-schedule-title {
-                font-size: 24px;
-                font-weight: 700;
-            }
-            .pdf-table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .pdf-table th {
-                background-color: #2c5282;
-                color: white;
-                padding: 15px;
-                text-align: center;
-                font-size: 16px;
-                font-weight: 600;
-            }
-            .pdf-table td {
-                padding: 12px 15px;
-                text-align: center;
-                border-bottom: 1px solid #e2e8f0;
-                font-size: 14px;
-                vertical-align: top;
-            }
-            .pdf-table tr:nth-child(even) {
-                background-color: #f8fafc;
-            }
-            .pdf-day-cell, .pdf-book-cell {
-                background-color: #edf2f7;
-                font-weight: 600;
-                color: #2d3748;
-            }
-            .pdf-subject {
-                display: inline-block;
-                padding: 6px 12px;
-                border-radius: 20px;
-                font-size: 12px;
-                font-weight: 500;
-                margin: 2px;
-                white-space: pre-line;
-                text-align: right;
-            }
-            .pdf-subject-math {
-                background-color: rgba(233, 30, 99, 0.15);
-                color: #c2185b;
-            }
-            .pdf-subject-science {
-                background-color: rgba(76, 175, 80, 0.15);
-                color: #388e3c;
-            }
-            .pdf-subject-language {
-                background-color: rgba(33, 150, 243, 0.15);
-                color: #1976d2;
-            }
-            .pdf-subject-history {
-                background-color: rgba(255, 152, 0, 0.15);
-                color: #f57c00;
-            }
-            .pdf-subject-literature {
-                background-color: rgba(156, 39, 176, 0.15);
-                color: #7b1fa2;
-            }
-            .pdf-subject-arabic {
-                background-color: rgba(0, 188, 212, 0.15);
-                color: #0097a7;
-            }
-            .pdf-subject-religion {
-                background-color: rgba(76, 175, 80, 0.15);
-                color: #388e3c;
-            }
-            .pdf-subject-empty {
-                color: #a0aec0;
-                font-style: italic;
-            }
-            .pdf-routine {
-                background-color: #f0f7ff;
-                border-radius: 12px;
-                padding: 30px;
-                margin-bottom: 30px;
-                border: 2px solid #e6f2ff;
-            }
-            .pdf-routine-title {
-                font-size: 24px;
-                font-weight: 700;
-                color: #1a365d;
-                margin-bottom: 20px;
-                text-align: center;
-            }
-            .pdf-routine-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            .pdf-routine-item {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-            .pdf-routine-label {
-                font-weight: 600;
-                color: #2c5282;
-                min-width: 120px;
-            }
-            .pdf-routine-value {
-                color: #2d3748;
-            }
-            .pdf-notes {
-                background-color: #f7fafc;
-                border-radius: 12px;
-                padding: 30px;
-                margin-bottom: 30px;
-                border: 1px solid #e2e8f0;
-            }
-            .pdf-notes-title {
-                font-size: 20px;
-                font-weight: 700;
-                color: #1a365d;
-                margin-bottom: 20px;
-                text-align: center;
-            }
-            .pdf-notes-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            .pdf-note-item {
-                background-color: white;
-                padding: 15px;
-                border-radius: 8px;
-                border-right: 4px solid #3182ce;
-            }
-            .pdf-note-day, .pdf-note-book {
-                font-weight: 600;
-                color: #1a365d;
-                margin-bottom: 8px;
-            }
-            .pdf-note-content {
-                color: #4a5568;
-                font-size: 14px;
-                white-space: pre-line;
-            }
-            .pdf-footer {
-                background-color: #1a365d;
-                color: white;
-                padding: 20px;
-                text-align: center;
-                border-radius: 12px;
-            }
-            .pdf-footer-text {
-                font-size: 14px;
-                opacity: 0.9;
-            }
-            @media print {
-                .pdf-info-grid,
-                .pdf-routine-grid,
-                .pdf-notes-grid {
-                    grid-template-columns: 1fr;
+            // تابع برای فرمت‌بندی متن مبحث (چندخطی)
+            function formatTopicText(book, topic, count, type) {
+                if (!book && !topic) return '';
+                
+                let result = '';
+                
+                // اضافه کردن نام کتاب در سطر اول
+                if (book) {
+                    result += book;
                 }
+                
+                // تقسیم متن موضوع به خطوط
+                if (topic) {
+                    const lines = topic.split('\n').filter(line => line.trim() !== '');
+                    if (lines.length > 0) {
+                        if (result) {
+                            result += '\n';
+                        }
+                        result += lines.join('\n');
+                    }
+                }
+                
+                // اضافه کردن تعداد تست در سطر آخر اگر مشخص شده باشد
+                if (count && count.trim() !== '') {
+                    let typeText = '';
+                    if (type === 'test') {
+                        typeText = 'تست';
+                    } else if (type === 'educational-test') {
+                        typeText = 'تست آموزشی';
+                    } else if (type === 'assessment-test') {
+                        typeText = 'تست سنجشی';
+                    } else if (type === 'descriptive') {
+                        typeText = 'تشریحی';
+                    }
+                    
+                    if (result) {
+                        result += '\n';
+                    }
+                    result += count + ' ' + typeText;
+                }
+                
+                return result;
             }
-        </style>
-    `;
 
-    let scheduleTableHTML = '';
-    
-    if (data.counselorType === 'standard') {
-        // جدول برنامه هفتگی (حالت استاندارد)
-        scheduleTableHTML = `
-            <div class="pdf-schedule">
-                <div class="pdf-schedule-header">
-                    <h2 class="pdf-schedule-title">جدول برنامه هفتگی</h2>
-                </div>
-                <table class="pdf-table">
-                    <thead>
-                        <tr>
-                            <th>روز / بازه زمانی</th>
-                            <th>صبحگاهی</th>
-                            <th>بعد از ظهر</th>
-                            <th>شبانه</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
-                            const morningParts = data.days[day]?.periods?.morning || [];
-                            const afternoonParts = data.days[day]?.periods?.afternoon || [];
-                            const eveningParts = data.days[day]?.periods?.evening || [];
+            const styles = `
+                <style>
+                    @page {
+                        size: A4;
+                        margin: 20mm;
+                    }
+                    body {
+                        font-family: 'Vazirmatn', sans-serif;
+                        direction: rtl;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1.6;
+                    }
+                    .pdf-header {
+                        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+                        color: white;
+                        padding: 40px;
+                        text-align: center;
+                        position: relative;
+                        overflow: hidden;
+                        border-radius: 12px;
+                        margin-bottom: 30px;
+                    }
+                    .pdf-header::before {
+                        content: '';
+                        position: absolute;
+                        top: -50px;
+                        right: -50px;
+                        width: 200px;
+                        height: 200px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .pdf-header::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -30px;
+                        left: -30px;
+                        width: 150px;
+                        height: 150px;
+                        border-radius: 50%;
+                        background: rgba(255, 255, 255, 0.1);
+                    }
+                    .pdf-logo-container {
+                        display: inline-block;
+                        background-color: white;
+                        padding: 10px;
+                        border-radius: 12px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                        margin-bottom: 20px;
+                    }
+                    .pdf-logo {
+                        max-width: 120px;
+                        height: auto;
+                        border-radius: 8px;
+                        display: block;
+                    }
+                    .pdf-title {
+                        font-size: 36px;
+                        font-weight: 800;
+                        margin-bottom: 10px;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .pdf-subtitle {
+                        font-size: 18px;
+                        opacity: 0.9;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .pdf-info {
+                        background-color: #f0f7ff;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border-radius: 12px;
+                        border: 2px solid #e6f2ff;
+                    }
+                    .pdf-info-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-info-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .pdf-info-label {
+                        font-weight: 700;
+                        color: #1a365d;
+                        min-width: 80px;
+                    }
+                    .pdf-info-value {
+                        color: #2d3748;
+                        font-weight: 500;
+                    }
+                    .pdf-schedule {
+                        background-color: white;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        margin-bottom: 30px;
+                    }
+                    .pdf-schedule-header {
+                        background-color: #3182ce;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                    }
+                    .pdf-schedule-title {
+                        font-size: 24px;
+                        font-weight: 700;
+                    }
+                    .pdf-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    .pdf-table th {
+                        background-color: #2c5282;
+                        color: white;
+                        padding: 15px;
+                        text-align: center;
+                        font-size: 16px;
+                        font-weight: 600;
+                    }
+                    .pdf-table td {
+                        padding: 12px 15px;
+                        text-align: center;
+                        border-bottom: 1px solid #e2e8f0;
+                        font-size: 14px;
+                        vertical-align: top;
+                    }
+                    .pdf-table tr:nth-child(even) {
+                        background-color: #f8fafc;
+                    }
+                    .pdf-day-cell, .pdf-book-cell {
+                        background-color: #edf2f7;
+                        font-weight: 600;
+                        color: #2d3748;
+                    }
+                    .pdf-subject {
+                        display: inline-block;
+                        padding: 6px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        margin: 2px;
+                        white-space: pre-line;
+                        text-align: center;
+                    }
+                    .pdf-subject-math {
+                        background-color: rgba(233, 30, 99, 0.15);
+                        color: #c2185b;
+                    }
+                    .pdf-subject-science {
+                        background-color: rgba(76, 175, 80, 0.15);
+                        color: #388e3c;
+                    }
+                    .pdf-subject-language {
+                        background-color: rgba(33, 150, 243, 0.15);
+                        color: #1976d2;
+                    }
+                    .pdf-subject-history {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                    }
+                    .pdf-subject-literature {
+                        background-color: rgba(156, 39, 176, 0.15);
+                        color: #7b1fa2;
+                    }
+                    .pdf-subject-arabic {
+                        background-color: rgba(0, 188, 212, 0.15);
+                        color: #0097a7;
+                    }
+                    .pdf-subject-religion {
+                        background-color: rgba(76, 175, 80, 0.15);
+                        color: #388e3c;
+                    }
+                    .pdf-subject-empty {
+                        color: #a0aec0;
+                        font-style: italic;
+                    }
+                    .pdf-routine {
+                        background-color: #f0f7ff;
+                        border-radius: 12px;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border: 2px solid #e6f2ff;
+                    }
+                    .pdf-routine-title {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #1a365d;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    .pdf-routine-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-routine-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                    }
+                    .pdf-routine-label {
+                        font-weight: 600;
+                        color: #2c5282;
+                        min-width: 120px;
+                    }
+                    .pdf-routine-value {
+                        color: #2d3748;
+                    }
+                    .pdf-notes {
+                        background-color: #f7fafc;
+                        border-radius: 12px;
+                        padding: 30px;
+                        margin-bottom: 30px;
+                        border: 1px solid #e2e8f0;
+                    }
+                    .pdf-notes-title {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #1a365d;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    }
+                    .pdf-notes-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 20px;
+                    }
+                    .pdf-note-item {
+                        background-color: white;
+                        padding: 15px;
+                        border-radius: 8px;
+                        border-right: 4px solid #3182ce;
+                    }
+                    .pdf-note-day, .pdf-note-book {
+                        font-weight: 600;
+                        color: #1a365d;
+                        margin-bottom: 8px;
+                    }
+                    .pdf-note-content {
+                        color: #4a5568;
+                        font-size: 14px;
+                        white-space: pre-line;
+                    }
+                    .pdf-footer {
+                        background-color: #1a365d;
+                        color: white;
+                        padding: 20px;
+                        text-align: center;
+                        border-radius: 12px;
+                    }
+                    .pdf-footer-text {
+                        font-size: 14px;
+                        opacity: 0.9;
+                    }
+                    @media print {
+                        .pdf-info-grid,
+                        .pdf-routine-grid,
+                        .pdf-notes-grid {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                </style>
+            `;
 
-                            const renderParts = (parts) => {
-                                if (parts.length === 0) {
-                                    return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
-                                }
-                                return parts.map(part => {
-                                    const colorClass = getSubjectColor(part.book);
-                                    const formattedText = formatTopicText(part.book, part.topic, part.count, part.type);
-                                    if (!formattedText) {
-                                        return '<span class="pdf-subject pdf-subject-empty">---</span>';
-                                    }
-                                    return `<span class="pdf-subject pdf-subject-${colorClass}">${formattedText}</span>`;
-                                }).join('<br>');
-                            };
-
-                            return `
+            let scheduleTableHTML = '';
+            
+            if (data.counselorType === 'standard') {
+                // جدول برنامه هفتگی (حالت استاندارد)
+                scheduleTableHTML = `
+                    <div class="pdf-schedule">
+                        <div class="pdf-schedule-header">
+                            <h2 class="pdf-schedule-title">جدول برنامه هفتگی</h2>
+                        </div>
+                        <table class="pdf-table">
+                            <thead>
                                 <tr>
-                                    <td class="pdf-day-cell">${day}</td>
-                                    <td>${renderParts(morningParts)}</td>
-                                    <td>${renderParts(afternoonParts)}</td>
-                                    <td>${renderParts(eveningParts)}</td>
+                                    <th>روز / بازه زمانی</th>
+                                    <th>صبحگاهی</th>
+                                    <th>بعد از ظهر</th>
+                                    <th>شبانه</th>
                                 </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    } else if (data.counselorType === 'alireza-torkamani') {
-        // جدول برنامه کتاب‌محور (حالت علیرضا ترکمانی)
-        const bookNames = Object.keys(data.books);
-        if (bookNames.length > 0) {
-            scheduleTableHTML = `
-                <div class="pdf-schedule">
-                    <div class="pdf-schedule-header">
-                        <h2 class="pdf-schedule-title">جدول برنامه مطالعاتی بر اساس کتاب‌ها</h2>
-                    </div>
-                    <table class="pdf-table">
-                        <thead>
-                            <tr>
-                                <th>بازه زمانی</th>
-                                ${bookNames.map(bookName => {
-                                    const bookColor = data.books[bookName]?.color;
-                                    return `<th ${bookColor ? `data-book-color="${bookColor}"` : ''}>${bookName}</th>`;
-                                }).join('')}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="pdf-day-cell">${data.program.dateRange || '---'}</td>
-                                ${bookNames.map(bookName => {
-                                    const bookParts = data.books[bookName]?.parts || [];
-                                    const bookColor = data.books[bookName]?.color;
+                            </thead>
+                            <tbody>
+                                ${["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
+                                    const morningParts = data.days[day]?.periods?.morning || [];
+                                    const afternoonParts = data.days[day]?.periods?.afternoon || [];
+                                    const eveningParts = data.days[day]?.periods?.evening || [];
+
                                     const renderParts = (parts) => {
                                         if (parts.length === 0) {
                                             return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
                                         }
                                         return parts.map(part => {
-                                            const formattedText = formatTopicText('', part.topic, part.count, part.type);
+                                            const colorClass = getSubjectColor(part.book);
+                                            const formattedText = formatTopicText(part.book, part.topic, part.count, part.type);
                                             if (!formattedText) {
                                                 return '<span class="pdf-subject pdf-subject-empty">---</span>';
                                             }
-                                            // استفاده از رنگ ذخیره شده برای کتاب
-                                            if (bookColor) {
-                                                return `<span class="pdf-subject" style="background-color: ${bookColor}15; color: ${bookColor}; border: 1px solid ${bookColor}30;">${formattedText}</span>`;
-                                            } else {
-                                                return `<span class="pdf-subject pdf-subject-${getSubjectColor(bookName)}">${formattedText}</span>`;
-                                            }
+                                            return `<span class="pdf-subject pdf-subject-${colorClass}">${formattedText}</span>`;
                                         }).join('<br>');
                                     };
-                                    return `<td>${renderParts(bookParts)}</td>`;
+
+                                    return `
+                                        <tr>
+                                            <td class="pdf-day-cell">${day}</td>
+                                            <td>${renderParts(morningParts)}</td>
+                                            <td>${renderParts(afternoonParts)}</td>
+                                            <td>${renderParts(eveningParts)}</td>
+                                        </tr>
+                                    `;
                                 }).join('')}
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else if (data.counselorType === 'alireza-torkamani') {
+                // جدول برنامه کتاب‌محور (حالت علیرضا ترکمانی)
+                const bookNames = Object.keys(data.books);
+                if (bookNames.length > 0) {
+                    scheduleTableHTML = `
+                        <div class="pdf-schedule">
+                            <div class="pdf-schedule-header">
+                                <h2 class="pdf-schedule-title">جدول برنامه مطالعاتی بر اساس کتاب‌ها</h2>
+                            </div>
+                            <table class="pdf-table">
+                                <thead>
+                                    <tr>
+                                        <th>بازه زمانی</th>
+                                        ${bookNames.map(bookName => {
+                                            const bookColor = data.books[bookName]?.color;
+                                            return `<th ${bookColor ? `data-book-color="${bookColor}"` : ''}>${bookName}</th>`;
+                                        }).join('')}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="pdf-day-cell">${data.program.dateRange || '---'}</td>
+                                        ${bookNames.map(bookName => {
+                                            const bookParts = data.books[bookName]?.parts || [];
+                                            const bookColor = data.books[bookName]?.color;
+                                            const renderParts = (parts) => {
+                                                if (parts.length === 0) {
+                                                    return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
+                                                }
+                                                return parts.map(part => {
+                                                    const formattedText = formatTopicText('', part.topic, part.count, part.type);
+                                                    if (!formattedText) {
+                                                        return '<span class="pdf-subject pdf-subject-empty">---</span>';
+                                                    }
+                                                    // استفاده از رنگ ذخیره شده برای کتاب
+                                                    if (bookColor) {
+                                                        return `<span class="pdf-subject" style="background-color: ${bookColor}15; color: ${bookColor}; border: 1px solid ${bookColor}30;">${formattedText}</span>`;
+                                                    } else {
+                                                        return `<span class="pdf-subject pdf-subject-${getSubjectColor(bookName)}">${formattedText}</span>`;
+                                                    }
+                                                }).join('<br>');
+                                            };
+                                            return `<td>${renderParts(bookParts)}</td>`;
+                                        }).join('')}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            }
+
+            const content = `
+                <!DOCTYPE html>
+                <html lang="fa" dir="rtl">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>برنامه مطالعه - ${data.student.name || 'دانش‌آموز'}</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                    ${styles}
+                </head>
+                <body>
+                    <!-- صفحه عنوان -->
+                    <div class="pdf-header">
+                        <div class="pdf-logo-container">
+                            <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="pdf-logo">
+                        </div>
+                        <h1 class="pdf-title">برنامه ${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی مطالعه'}</h1>
+                        <p class="pdf-subtitle">آکادمی تحصیلی رادیان</p>
+                    </div>
+
+                    <!-- اطلاعات اصلی -->
+                    <div class="pdf-info">
+                        <div class="pdf-info-grid">
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">مشاور:</span>
+                                <span class="pdf-info-value">${data.counselor.name || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">شماره تماس:</span>
+                                <span class="pdf-info-value">${data.counselor.contact || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">دانش‌آموز:</span>
+                                <span class="pdf-info-value">${data.student.name || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">پایه تحصیلی:</span>
+                                <span class="pdf-info-value">${data.student.grade || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">رشته تحصیلی:</span>
+                                <span class="pdf-info-value">${data.student.field || '---'}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">${data.counselorType === 'alireza-torkamani' ? 'بازه زمانی:' : 'شماره هفته:'}</span>
+                                <span class="pdf-info-value">${data.counselorType === 'alireza-torkamani' ? (data.program.dateRange || '---') : (data.program.weekNumber || '---')}</span>
+                            </div>
+                            <div class="pdf-info-item">
+                                <span class="pdf-info-label">تاریخ برنامه‌ریزی:</span>
+                                <span class="pdf-info-value">${data.program.date || '---'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${scheduleTableHTML}
+
+                    <!-- روتین شبانه -->
+                    <div class="pdf-routine">
+                        <h2 class="pdf-routine-title">روتین شبانه</h2>
+                        <div class="pdf-routine-grid">
+                            <div class="pdf-routine-item">
+                                <span class="pdf-routine-label">زمان خواب:</span>
+                                <span class="pdf-routine-value">${data.routine.sleepTime || '---'}</span>
+                            </div>
+                            <div class="pdf-routine-item">
+                                <span class="pdf-routine-label">زمان بیداری:</span>
+                                <span class="pdf-routine-value">${data.routine.wakeTime || '---'}</span>
+                            </div>
+                        </div>
+                        ${data.routine.description ? `
+                            <div style="margin-top: 20px;">
+                                <div style="font-weight: 600; color: #2c5282; margin-bottom: 10px;">توضیحات کلی:</div>
+                                <div style="color: #4a5568; line-height: 1.6; white-space: pre-line;">${data.routine.description}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <!-- توضیحات روزانه/کتابی -->
+                    <div class="pdf-notes">
+                        <h2 class="pdf-notes-title">توضیحات ${data.counselorType === 'alireza-torkamani' ? 'کتابی' : 'روزانه'}</h2>
+                        <div class="pdf-notes-grid">
+                            ${data.counselorType === 'standard' ? 
+                                ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
+                                    const notes = data.days[day]?.notes || '';
+                                    if (notes && notes !== `توضیحات مربوط به ${day} را در اینجا وارد کنید...`) {
+                                        return `
+                                            <div class="pdf-note-item">
+                                                <div class="pdf-note-day">${day}:</div>
+                                                <div class="pdf-note-content">${notes}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).filter(item => item !== '').join('') :
+                                Object.keys(data.books).map(bookName => {
+                                    const notes = data.books[bookName]?.notes || '';
+                                    if (notes && notes !== `توضیحات مربوط به کتاب ${bookName} را در اینجا وارد کنید...`) {
+                                        return `
+                                            <div class="pdf-note-item">
+                                                <div class="pdf-note-book">${bookName}:</div>
+                                                <div class="pdf-note-content">${notes}</div>
+                                            </div>
+                                        `;
+                                    }
+                                    return '';
+                                }).filter(item => item !== '').join('')
+                            }
+                        </div>
+                    </div>
+
+                    <!-- فوتر -->
+                    <div class="pdf-footer">
+                        <p class="pdf-footer-text">این برنامه توسط آکادمی تحصیلی رادیان تهیه شده است | ${getPersianDate()}</p>
+                    </div>
+                </body>
+                </html>
             `;
+
+            return content;
         }
-    }
-
-    const content = `
-        <!DOCTYPE html>
-        <html lang="fa" dir="rtl">
-        <head>
-            <meta charset="UTF-8">
-            <title>برنامه مطالعه - ${data.student.name || 'دانش‌آموز'}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-            ${styles}
-        </head>
-        <body>
-            <!-- صفحه عنوان -->
-            <div class="pdf-header">
-                <div class="pdf-logo-container">
-                    <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="pdf-logo">
-                </div>
-                <h1 class="pdf-title">برنامه ${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی مطالعه'}</h1>
-                <p class="pdf-subtitle">آکادمی تحصیلی رادیان</p>
-            </div>
-
-            <!-- اطلاعات اصلی -->
-            <div class="pdf-info">
-                <div class="pdf-info-grid">
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">مشاور:</span>
-                        <span class="pdf-info-value">${data.counselor.name || '---'}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">شماره تماس:</span>
-                        <span class="pdf-info-value">${data.counselor.contact || '---'}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">دانش‌آموز:</span>
-                        <span class="pdf-info-value">${data.student.name || '---'}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">پایه تحصیلی:</span>
-                        <span class="pdf-info-value">${data.student.grade || '---'}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">رشته تحصیلی:</span>
-                        <span class="pdf-info-value">${data.student.field || '---'}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">${data.counselorType === 'alireza-torkamani' ? 'بازه زمانی:' : 'شماره هفته:'}</span>
-                        <span class="pdf-info-value">${data.counselorType === 'alireza-torkamani' ? (data.program.dateRange || '---') : (data.program.weekNumber || '---')}</span>
-                    </div>
-                    <div class="pdf-info-item">
-                        <span class="pdf-info-label">تاریخ برنامه‌ریزی:</span>
-                        <span class="pdf-info-value">${data.program.date || '---'}</span>
-                    </div>
-                </div>
-            </div>
-
-            ${scheduleTableHTML}
-
-            <!-- روتین شبانه -->
-            <div class="pdf-routine">
-                <h2 class="pdf-routine-title">روتین شبانه</h2>
-                <div class="pdf-routine-grid">
-                    <div class="pdf-routine-item">
-                        <span class="pdf-routine-label">زمان خواب:</span>
-                        <span class="pdf-routine-value">${data.routine.sleepTime || '---'}</span>
-                    </div>
-                    <div class="pdf-routine-item">
-                        <span class="pdf-routine-label">زمان بیداری:</span>
-                        <span class="pdf-routine-value">${data.routine.wakeTime || '---'}</span>
-                    </div>
-                </div>
-                ${data.routine.description ? `
-                    <div style="margin-top: 20px;">
-                        <div style="font-weight: 600; color: #2c5282; margin-bottom: 10px;">توضیحات کلی:</div>
-                        <div style="color: #4a5568; line-height: 1.6; white-space: pre-line;">${data.routine.description}</div>
-                    </div>
-                ` : ''}
-            </div>
-
-            <!-- توضیحات روزانه/کتابی -->
-            <div class="pdf-notes">
-                <h2 class="pdf-notes-title">توضیحات ${data.counselorType === 'alireza-torkamani' ? 'کتابی' : 'روزانه'}</h2>
-                <div class="pdf-notes-grid">
-                    ${data.counselorType === 'standard' ? 
-                        ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه"].map(day => {
-                            const notes = data.days[day]?.notes || '';
-                            if (notes && notes !== `توضیحات مربوط به ${day} را در اینجا وارد کنید...`) {
-                                return `
-                                    <div class="pdf-note-item">
-                                        <div class="pdf-note-day">${day}:</div>
-                                        <div class="pdf-note-content">${notes}</div>
-                                    </div>
-                                `;
-                            }
-                            return '';
-                        }).filter(item => item !== '').join('') :
-                        Object.keys(data.books).map(bookName => {
-                            const notes = data.books[bookName]?.notes || '';
-                            if (notes && notes !== `توضیحات مربوط به کتاب ${bookName} را در اینجا وارد کنید...`) {
-                                return `
-                                    <div class="pdf-note-item">
-                                        <div class="pdf-note-book">${bookName}:</div>
-                                        <div class="pdf-note-content">${notes}</div>
-                                    </div>
-                                `;
-                            }
-                            return '';
-                        }).filter(item => item !== '').join('')
-                    }
-                </div>
-            </div>
-
-            <!-- فوتر -->
-            <div class="pdf-footer">
-                <p class="pdf-footer-text">این برنامه توسط آکادمی تحصیلی رادیان تهیه شده است | ${getPersianDate()}</p>
-            </div>
-        </body>
-        </html>
-    `;
-
-    return content;
-}
 
         // === دانلود مستقیم HTML با استفاده از Blob ===
         function downloadHTMLDirectly(fileName) {
@@ -2824,293 +2843,333 @@ function generateHTMLContent() {
         }
 
         // === استخراج داده از HTML (نسخه اصلاح شده) ===
-        // === استخراج داده از HTML (نسخه کاملاً اصلاح شده) ===
-// === استخراج داده از HTML (نسخه کاملاً اصلاح شده) ===
-function extractDataFromHTML(htmlContent) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    
-    // تشخیص نوع مشاور از عنوان
-    const title = doc.querySelector('.pdf-title')?.textContent || '';
-    const isAlirezaTorkamani = title.includes('مطالعاتی');
-    
-    // استخراج اطلاعات از بخش اطلاعات اصلی
-    const data = {
-        counselor: {
-            name: '',
-            contact: ''
-        },
-        student: {
-            name: '',
-            grade: '',
-            field: ''
-        },
-        program: {
-            date: '',
-            weekNumber: '',
-            dateRange: ''
-        },
-        counselorType: isAlirezaTorkamani ? 'alireza-torkamani' : 'standard',
-        days: {},
-        books: {},
-        routine: {
-            description: '',
-            sleepTime: '',
-            wakeTime: ''
-        }
-    };
-
-    // استخراج اطلاعات از بخش اطلاعات اصلی
-    const infoItems = doc.querySelectorAll('.pdf-info-item');
-    infoItems.forEach(item => {
-        const label = item.querySelector('.pdf-info-label')?.textContent.trim();
-        const value = item.querySelector('.pdf-info-value')?.textContent.trim();
-        
-        if (label === 'مشاور:') {
-            data.counselor.name = value;
-        } else if (label === 'شماره تماس:') {
-            data.counselor.contact = value;
-        } else if (label === 'دانش‌آموز:') {
-            data.student.name = value;
-        } else if (label === 'پایه تحصیلی:') {
-            data.student.grade = value;
-        } else if (label === 'رشته تحصیلی:') {
-            data.student.field = value;
-        } else if (label === 'شماره هفته:') {
-            data.program.weekNumber = value;
-        } else if (label === 'بازه زمانی:') {
-            data.program.dateRange = value;
-        } else if (label === 'تاریخ برنامه‌ریزی:') {
-            data.program.date = value;
-        }
-    });
-
-    // استخراج اطلاعات روتین شبانه
-    const routineItems = doc.querySelectorAll('.pdf-routine-item');
-    routineItems.forEach(item => {
-        const label = item.querySelector('.pdf-routine-label')?.textContent.trim();
-        const value = item.querySelector('.pdf-routine-value')?.textContent.trim();
-        
-        if (label === 'زمان خواب:') {
-            data.routine.sleepTime = value;
-        } else if (label === 'زمان بیداری:') {
-            data.routine.wakeTime = value;
-        }
-    });
-
-    // استخراج توضیحات کلی روتین شبانه
-    const routineDescription = doc.querySelector('.pdf-routine div[style*="margin-top: 20px;"] div:last-child');
-    if (routineDescription) {
-        data.routine.description = routineDescription.textContent.trim();
-    }
-
-    if (isAlirezaTorkamani) {
-        // استخراج اطلاعات کتاب‌ها از جدول
-        const tableHeaders = doc.querySelectorAll('.pdf-table th');
-        const bookNames = [];
-        
-        // استخراج نام کتاب‌ها از هدر جدول
-        for (let i = 1; i < tableHeaders.length; i++) {
-            bookNames.push(tableHeaders[i].textContent.trim());
-        }
-        
-        // استخراج بازه زمانی از جدول
-        const dateRangeCell = doc.querySelector('.pdf-table tbody tr td:first-child');
-        if (dateRangeCell) {
-            data.program.dateRange = dateRangeCell.textContent.trim();
-        }
-        
-        // استخراج اطلاعات هر کتاب
-        const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
-        if (tableRows.length > 0) {
-            const cells = tableRows[0].querySelectorAll('td');
+        function extractDataFromHTML(htmlContent) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
             
-            for (let i = 1; i < cells.length && i - 1 < bookNames.length; i++) {
-                const bookName = bookNames[i - 1];
-                const partsHTML = cells[i].innerHTML;
+            // تشخیص نوع مشاور از عنوان
+            const title = doc.querySelector('.pdf-title')?.textContent || '';
+            const isAlirezaTorkamani = title.includes('مطالعاتی');
+            
+            // استخراج اطلاعات از بخش اطلاعات اصلی
+            const data = {
+                counselor: {
+                    name: '',
+                    contact: ''
+                },
+                student: {
+                    name: '',
+                    grade: '',
+                    field: ''
+                },
+                program: {
+                    date: '',
+                    weekNumber: '',
+                    dateRange: ''
+                },
+                counselorType: isAlirezaTorkamani ? 'alireza-torkamani' : 'standard',
+                days: {},
+                books: {},
+                routine: {
+                    description: '',
+                    sleepTime: '',
+                    wakeTime: ''
+                }
+            };
+
+            // استخراج اطلاعات از بخش اطلاعات اصلی
+            const infoItems = doc.querySelectorAll('.pdf-info-item');
+            infoItems.forEach(item => {
+                const label = item.querySelector('.pdf-info-label')?.textContent.trim();
+                const value = item.querySelector('.pdf-info-value')?.textContent.trim();
                 
-                // استخراج رنگ از استایل اگر وجود دارد
-                let bookColor = null;
-                const firstSubjectSpan = cells[i].querySelector('.pdf-subject');
-                if (firstSubjectSpan && firstSubjectSpan.style.backgroundColor) {
-                    // تبدیل rgba به hex اگر لازم است
-                    const bgColor = firstSubjectSpan.style.backgroundColor;
-                    if (bgColor.startsWith('rgba')) {
-                        const rgba = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
-                        if (rgba) {
-                            bookColor = rgbToHex(parseInt(rgba[1]), parseInt(rgba[2]), parseInt(rgba[3]));
-                        }
-                    } else if (bgColor.startsWith('#')) {
-                        bookColor = bgColor;
-                    }
+                if (label === 'مشاور:') {
+                    data.counselor.name = value;
+                } else if (label === 'شماره تماس:') {
+                    data.counselor.contact = value;
+                } else if (label === 'دانش‌آموز:') {
+                    data.student.name = value;
+                } else if (label === 'پایه تحصیلی:') {
+                    data.student.grade = value;
+                } else if (label === 'رشته تحصیلی:') {
+                    data.student.field = value;
+                } else if (label === 'شماره هفته:') {
+                    data.program.weekNumber = value;
+                } else if (label === 'بازه زمانی:') {
+                    data.program.dateRange = value;
+                } else if (label === 'تاریخ برنامه‌ریزی:') {
+                    data.program.date = value;
+                }
+            });
+
+            // استخراج اطلاعات روتین شبانه
+            const routineItems = doc.querySelectorAll('.pdf-routine-item');
+            routineItems.forEach(item => {
+                const label = item.querySelector('.pdf-routine-label')?.textContent.trim();
+                const value = item.querySelector('.pdf-routine-value')?.textContent.trim();
+                
+                if (label === 'زمان خواب:') {
+                    data.routine.sleepTime = value;
+                } else if (label === 'زمان بیداری:') {
+                    data.routine.wakeTime = value;
+                }
+            });
+
+            // استخراج توضیحات کلی روتین شبانه
+            const routineDescription = doc.querySelector('.pdf-routine div[style*="margin-top: 20px;"] div:last-child');
+            if (routineDescription) {
+                data.routine.description = routineDescription.textContent.trim();
+            }
+
+            if (isAlirezaTorkamani) {
+                // استخراج اطلاعات کتاب‌ها از جدول
+                const tableHeaders = doc.querySelectorAll('.pdf-table th');
+                const bookNames = [];
+                
+                // استخراج نام کتاب‌ها از هدر جدول
+                for (let i = 1; i < tableHeaders.length; i++) {
+                    bookNames.push(tableHeaders[i].textContent.trim());
                 }
                 
-                // تابع برای استخراج پارت‌ها از HTML
-                const extractParts = (html) => {
-                    const parts = [];
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    
-                    const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
-                    subjectSpans.forEach(span => {
-                        const text = span.textContent.trim();
-                        
-                        // فرمت جدید: چند خطی با تعداد تست در خط آخر
-                        const lines = text.split('\n').filter(line => line.trim() !== '');
-                        if (lines.length > 0) {
-                            // آخرین خط ممکن است شامل تعداد تست باشد
-                            const lastLine = lines[lines.length - 1];
-                            const testMatch = lastLine.match(/(\d+)\s*(تستی|تشریحی)/);
-                            
-                            let topic = '';
-                            let count = '';
-                            let type = 'test';
-                            
-                            if (testMatch) {
-                                // اگر تعداد تست مشخص شده باشد
-                                count = testMatch[1];
-                                type = testMatch[2] === 'تستی' ? 'test' : 'descriptive';
-                                // موضوع شامل تمام خطوط به جز آخرین خط
-                                topic = lines.slice(0, -1).join('\n');
-                            } else {
-                                // بررسی فرمت قدیمی (پرانتز)
-                                const oldFormatMatch = text.match(/(.+)\s*\((\d+)\s*(تست|تشریحی)\)/);
-                                if (oldFormatMatch) {
-                                    topic = oldFormatMatch[1].trim();
-                                    count = oldFormatMatch[2];
-                                    type = oldFormatMatch[3] === 'تست' ? 'test' : 'descriptive';
-                                } else {
-                                    // اگر تعداد تست مشخص نشده باشد، تمام خطوط موضوع هستند
-                                    topic = lines.join('\n');
-                                }
-                            }
-                            
-                            parts.push({
-                                topic: topic,
-                                count: count,
-                                type: type
-                            });
-                        }
-                    });
-                    
-                    return parts;
-                };
+                // استخراج بازه زمانی از جدول
+                const dateRangeCell = doc.querySelector('.pdf-table tbody tr td:first-child');
+                if (dateRangeCell) {
+                    data.program.dateRange = dateRangeCell.textContent.trim();
+                }
                 
-                data.books[bookName] = {
-                    color: bookColor, // ذخیره رنگ استخراج شده
-                    parts: extractParts(partsHTML),
-                    notes: ''
-                };
+                // استخراج اطلاعات هر کتاب
+                const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
+                if (tableRows.length > 0) {
+                    const cells = tableRows[0].querySelectorAll('td');
+                    
+                    for (let i = 1; i < cells.length && i - 1 < bookNames.length; i++) {
+                        const bookName = bookNames[i - 1];
+                        const partsHTML = cells[i].innerHTML;
+                        
+                        // استخراج رنگ از استایل اگر وجود دارد
+                        let bookColor = null;
+                        const firstSubjectSpan = cells[i].querySelector('.pdf-subject');
+                        if (firstSubjectSpan && firstSubjectSpan.style.backgroundColor) {
+                            // تبدیل rgba به hex اگر لازم است
+                            const bgColor = firstSubjectSpan.style.backgroundColor;
+                            if (bgColor.startsWith('rgba')) {
+                                const rgba = bgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d*\.?\d+))?\)/);
+                                if (rgba) {
+                                    bookColor = rgbToHex(parseInt(rgba[1]), parseInt(rgba[2]), parseInt(rgba[3]));
+                                }
+                            } else if (bgColor.startsWith('#')) {
+                                bookColor = bgColor;
+                            }
+                        }
+                        
+                        // تابع برای استخراج پارت‌ها از HTML
+                        const extractParts = (html) => {
+                            const parts = [];
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            
+                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectSpans.forEach(span => {
+                                const text = span.textContent.trim();
+                                
+                                // فرمت جدید: چند خطی با تعداد تست در خط آخر
+                                const lines = text.split('\n').filter(line => line.trim() !== '');
+                                if (lines.length > 0) {
+                                    // آخرین خط ممکن است شامل تعداد تست باشد
+                                    const lastLine = lines[lines.length - 1];
+                                    const testMatch = lastLine.match(/(\d+)\s*(تست|تست آموزشی|تست سنجشی|تشریحی)/);
+                                    
+                                    let topic = '';
+                                    let count = '';
+                                    let type = 'educational-test'; // پیش‌فرض تست آموزشی
+                                    
+                                    if (testMatch) {
+                                        // اگر تعداد تست مشخص شده باشد
+                                        count = testMatch[1];
+                                        const typeText = testMatch[2];
+                                        
+                                        if (typeText === 'تست آموزشی') {
+                                            type = 'educational-test';
+                                        } else if (typeText === 'تست سنجشی') {
+                                            type = 'assessment-test';
+                                        } else if (typeText === 'تشریحی') {
+                                            type = 'descriptive';
+                                        } else if (typeText === 'تست') {
+                                            type = 'test';
+                                        }
+                                        
+                                        // موضوع شامل تمام خطوط به جز آخرین خط
+                                        topic = lines.slice(0, -1).join('\n');
+                                    } else {
+                                        // بررسی فرمت قدیمی (پرانتز)
+                                        const oldFormatMatch = text.match(/(.+)\s*\((\d+)\s*(تست|تست آموزشی|تست سنجشی|تشریحی)\)/);
+                                        if (oldFormatMatch) {
+                                            topic = oldFormatMatch[1].trim();
+                                            count = oldFormatMatch[2];
+                                            const typeText = oldFormatMatch[3];
+                                            
+                                            if (typeText === 'تست آموزشی') {
+                                                type = 'educational-test';
+                                            } else if (typeText === 'تست سنجشی') {
+                                                type = 'assessment-test';
+                                            } else if (typeText === 'تشریحی') {
+                                                type = 'descriptive';
+                                            } else if (typeText === 'تست') {
+                                                type = 'test';
+                                            }
+                                        } else {
+                                            // اگر تعداد تست مشخص نشده باشد، تمام خطوط موضوع هستند
+                                            topic = lines.join('\n');
+                                        }
+                                    }
+                                    
+                                    parts.push({
+                                        topic: topic,
+                                        count: count,
+                                        type: type
+                                    });
+                                }
+                            });
+                            
+                            return parts;
+                        };
+                        
+                        data.books[bookName] = {
+                            color: bookColor, // ذخیره رنگ استخراج شده
+                            parts: extractParts(partsHTML),
+                            notes: ''
+                        };
+                    }
+                }
+
+                // استخراج توضیحات کتابی
+                const noteItems = doc.querySelectorAll('.pdf-note-item');
+                noteItems.forEach(item => {
+                    const bookName = item.querySelector('.pdf-note-book')?.textContent.trim().replace(':', '');
+                    const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
+                    
+                    if (bookName && data.books[bookName]) {
+                        data.books[bookName].notes = noteContent;
+                    }
+                });
+            } else {
+                // استخراج اطلاعات روزها از جدول برنامه هفتگی
+                const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
+                tableRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    if (cells.length >= 4) {
+                        const dayName = cells[0].textContent.trim();
+                        const morningHTML = cells[1].innerHTML;
+                        const afternoonHTML = cells[2].innerHTML;
+                        const eveningHTML = cells[3].innerHTML;
+                        
+                        // تابع برای استخراج پارت‌ها از HTML
+                        const extractParts = (html) => {
+                            const parts = [];
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            
+                            const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
+                            subjectSpans.forEach(span => {
+                                const text = span.textContent.trim();
+                                
+                                // فرمت جدید: چند خطی با کتاب در سطر اول و تعداد تست در سطر آخر
+                                const lines = text.split('\n').filter(line => line.trim() !== '');
+                                if (lines.length > 0) {
+                                    const firstLine = lines[0]; // سطر اول: نام کتاب
+                                    const lastLine = lines[lines.length - 1]; // سطر آخر: ممکن است تعداد تست باشد
+                                    
+                                    let book = firstLine;
+                                    let topic = '';
+                                    let count = '';
+                                    let type = 'test';
+                                    
+                                    // بررسی سطر آخر برای تعداد تست
+                                    const testMatch = lastLine.match(/(\d+)\s*(تست|تست آموزشی|تست سنجشی|تشریحی)/);
+                                    
+                                    if (testMatch && lines.length > 1) {
+                                        // اگر تعداد تست مشخص شده باشد و بیش از یک خط وجود داشته باشد
+                                        count = testMatch[1];
+                                        const typeText = testMatch[2];
+                                        
+                                        if (typeText === 'تست آموزشی') {
+                                            type = 'educational-test';
+                                        } else if (typeText === 'تست سنجشی') {
+                                            type = 'assessment-test';
+                                        } else if (typeText === 'تشریحی') {
+                                            type = 'descriptive';
+                                        } else if (typeText === 'تست') {
+                                            type = 'test';
+                                        }
+                                        
+                                        // موضوع شامل خطوط میانی (از خط دوم تا یکی مانده به آخر)
+                                        topic = lines.slice(1, -1).join('\n');
+                                    } else {
+                                        // بررسی فرمت قدیمی (پرانتز)
+                                        const oldFormatMatch = text.match(/(.+)\s*-\s*(.+)\s*\((\d+)\s*(تست|تست آموزشی|تست سنجشی|تشریحی)\)/);
+                                        if (oldFormatMatch) {
+                                            book = oldFormatMatch[1].trim();
+                                            topic = oldFormatMatch[2].trim();
+                                            count = oldFormatMatch[3];
+                                            const typeText = oldFormatMatch[4];
+                                            
+                                            if (typeText === 'تست آموزشی') {
+                                                type = 'educational-test';
+                                            } else if (typeText === 'تست سنجشی') {
+                                                type = 'assessment-test';
+                                            } else if (typeText === 'تشریحی') {
+                                                type = 'descriptive';
+                                            } else if (typeText === 'تست') {
+                                                type = 'test';
+                                            }
+                                        } else {
+                                            // اگر تعداد تست مشخص نشده باشد، تمام خطوط بعد از اول موضوع هستند
+                                            topic = lines.slice(1).join('\n');
+                                        }
+                                    }
+                                    
+                                    parts.push({
+                                        book: book,
+                                        topic: topic,
+                                        count: count,
+                                        type: type
+                                    });
+                                }
+                            });
+                            
+                            return parts;
+                        };
+                        
+                        data.days[dayName] = {
+                            periods: {
+                                morning: extractParts(morningHTML),
+                                afternoon: extractParts(afternoonHTML),
+                                evening: extractParts(eveningHTML)
+                            },
+                            notes: ''
+                        };
+                    }
+                });
+
+                // استخراج توضیحات روزانه
+                const noteItems = doc.querySelectorAll('.pdf-note-item');
+                noteItems.forEach(item => {
+                    const dayName = item.querySelector('.pdf-note-day')?.textContent.trim().replace(':', '');
+                    const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
+                    
+                    if (dayName && data.days[dayName]) {
+                        data.days[dayName].notes = noteContent;
+                    }
+                });
             }
+
+            return data;
         }
 
-        // استخراج توضیحات کتابی
-        const noteItems = doc.querySelectorAll('.pdf-note-item');
-        noteItems.forEach(item => {
-            const bookName = item.querySelector('.pdf-note-book')?.textContent.trim().replace(':', '');
-            const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
-            
-            if (bookName && data.books[bookName]) {
-                data.books[bookName].notes = noteContent;
-            }
-        });
-    } else {
-        // استخراج اطلاعات روزها از جدول برنامه هفتگی
-        const tableRows = doc.querySelectorAll('.pdf-table tbody tr');
-        tableRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length >= 4) {
-                const dayName = cells[0].textContent.trim();
-                const morningHTML = cells[1].innerHTML;
-                const afternoonHTML = cells[2].innerHTML;
-                const eveningHTML = cells[3].innerHTML;
-                
-                // تابع برای استخراج پارت‌ها از HTML
-                const extractParts = (html) => {
-                    const parts = [];
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = html;
-                    
-                    const subjectSpans = tempDiv.querySelectorAll('.pdf-subject:not(.pdf-subject-empty)');
-                    subjectSpans.forEach(span => {
-                        const text = span.textContent.trim();
-                        
-                        // فرمت جدید: چند خطی با کتاب در سطر اول و تعداد تست در سطر آخر
-                        const lines = text.split('\n').filter(line => line.trim() !== '');
-                        if (lines.length > 0) {
-                            const firstLine = lines[0]; // سطر اول: نام کتاب
-                            const lastLine = lines[lines.length - 1]; // سطر آخر: ممکن است تعداد تست باشد
-                            
-                            let book = firstLine;
-                            let topic = '';
-                            let count = '';
-                            let type = 'test';
-                            
-                            // بررسی سطر آخر برای تعداد تست
-                            const testMatch = lastLine.match(/(\d+)\s*(تستی|تشریحی)/);
-                            
-                            if (testMatch && lines.length > 1) {
-                                // اگر تعداد تست مشخص شده باشد و بیش از یک خط وجود داشته باشد
-                                count = testMatch[1];
-                                type = testMatch[2] === 'تستی' ? 'test' : 'descriptive';
-                                // موضوع شامل خطوط میانی (از خط دوم تا یکی مانده به آخر)
-                                topic = lines.slice(1, -1).join('\n');
-                            } else {
-                                // بررسی فرمت قدیمی (پرانتز)
-                                const oldFormatMatch = text.match(/(.+)\s*-\s*(.+)\s*\((\d+)\s*(تست|تشریحی)\)/);
-                                if (oldFormatMatch) {
-                                    book = oldFormatMatch[1].trim();
-                                    topic = oldFormatMatch[2].trim();
-                                    count = oldFormatMatch[3];
-                                    type = oldFormatMatch[4] === 'تست' ? 'test' : 'descriptive';
-                                } else {
-                                    // اگر تعداد تست مشخص نشده باشد، تمام خطوط بعد از اول موضوع هستند
-                                    topic = lines.slice(1).join('\n');
-                                }
-                            }
-                            
-                            parts.push({
-                                book: book,
-                                topic: topic,
-                                count: count,
-                                type: type
-                            });
-                        }
-                    });
-                    
-                    return parts;
-                };
-                
-                data.days[dayName] = {
-                    periods: {
-                        morning: extractParts(morningHTML),
-                        afternoon: extractParts(afternoonHTML),
-                        evening: extractParts(eveningHTML)
-                    },
-                    notes: ''
-                };
-            }
-        });
-
-        // استخراج توضیحات روزانه
-        const noteItems = doc.querySelectorAll('.pdf-note-item');
-        noteItems.forEach(item => {
-            const dayName = item.querySelector('.pdf-note-day')?.textContent.trim().replace(':', '');
-            const noteContent = item.querySelector('.pdf-note-content')?.textContent.trim();
-            
-            if (dayName && data.days[dayName]) {
-                data.days[dayName].notes = noteContent;
-            }
-        });
-    }
-
-    return data;
-}
-
-// تابع کمکی برای تبدیل RGB به Hex
-function rgbToHex(r, g, b) {
-    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-}
+        // تابع کمکی برای تبدیل RGB به Hex
+        function rgbToHex(r, g, b) {
+            return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        }
 
         function handleFileUpload(file) {
             if (!file.type.includes('html')) {
@@ -3343,38 +3402,38 @@ function rgbToHex(r, g, b) {
         }
 
         // === تابع برای افزودن کتاب جدید ===
-function addNewBook(bookName, color = null) {
-    const daysContainer = document.getElementById('daysContainer');
-    const existingBooks = daysContainer.querySelectorAll('.day-card[data-book]');
-    const bookIndex = existingBooks.length;
-    
-    // ایجاد کارت کتاب جدید
-    const bookCardHTML = createBookCardHTML(bookName, bookIndex, color);
-    
-    // پیدا کردن دکمه افزودن کتاب (که همیشه آخرین فرزند است)
-    const addBookBtn = daysContainer.querySelector('.btn-primary');
-    
-    if (addBookBtn) {
-        // اضافه کردن کتاب دقیقاً قبل از دکمه (پایین لیست)
-        addBookBtn.insertAdjacentHTML('beforebegin', bookCardHTML);
-    } else {
-        // اگر دکمه پیدا نشد، کتاب را به انتهای کانتینر اضافه کن
-        daysContainer.insertAdjacentHTML('beforeend', bookCardHTML);
-        
-        // سپس دکمه را دوباره اضافه کن
-        daysContainer.insertAdjacentHTML('beforeend', `
-            <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
-                <span class="material-icons">add_circle</span>
-                افزودن کتاب جدید
-            </button>
-        `);
-    }
-    
-    // تنظیم مجدد select های کاستوم
-    setupCustomSelects();
-    
-    showToast(`کتاب "${bookName}" با موفقیت اضافه شد`, 'success');
-}
+        function addNewBook(bookName, color = null) {
+            const daysContainer = document.getElementById('daysContainer');
+            const existingBooks = daysContainer.querySelectorAll('.day-card[data-book]');
+            const bookIndex = existingBooks.length;
+            
+            // ایجاد کارت کتاب جدید
+            const bookCardHTML = createBookCardHTML(bookName, bookIndex, color);
+            
+            // پیدا کردن دکمه افزودن کتاب (که همیشه آخرین فرزند است)
+            const addBookBtn = daysContainer.querySelector('.btn-primary');
+            
+            if (addBookBtn) {
+                // اضافه کردن کتاب دقیقاً قبل از دکمه (پایین لیست)
+                addBookBtn.insertAdjacentHTML('beforebegin', bookCardHTML);
+            } else {
+                // اگر دکمه پیدا نشد، کتاب را به انتهای کانتینر اضافه کن
+                daysContainer.insertAdjacentHTML('beforeend', bookCardHTML);
+                
+                // سپس دکمه را دوباره اضافه کن
+                daysContainer.insertAdjacentHTML('beforeend', `
+                    <button class="btn btn-primary" onclick="showAddBookModal()" style="margin-bottom: 20px; width: 100%;">
+                        <span class="material-icons">add_circle</span>
+                        افزودن کتاب جدید
+                    </button>
+                `);
+            }
+            
+            // تنظیم مجدد select های کاستوم
+            setupCustomSelects();
+            
+            showToast(`کتاب "${bookName}" با موفقیت اضافه شد`, 'success');
+        }
 
         // === تابع برای حذف کتاب ===
         function deleteBook(bookName) {
