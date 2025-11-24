@@ -58,7 +58,7 @@
 
         /* === هدر === */
         .header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 30px 20px;
             text-align: center;
@@ -300,12 +300,13 @@
         }
 
         .btn-primary {
-            background-color: var(--accent-color);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         .btn-secondary {
@@ -324,6 +325,7 @@
         /* === بخش برنامه هفتگی === */
         .schedule-section {
             padding: 30px;
+            border-bottom: 1px solid var(--border-color); /* خط جداکننده بالای جدول */
         }
 
         .section-title {
@@ -347,17 +349,17 @@
         }
 
         /* === محدود کردن نمایش کتاب‌ها به حداکثر ۲ ستون === */
-.days-container:has(.day-card[data-book]) {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    max-width: 100%;
-}
+        .days-container:has(.day-card[data-book]) {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            max-width: 100%;
+        }
 
-/* برای صفحات بزرگ، حداکثر ۲ ستون */
-@media (min-width: 1200px) {
-    .days-container:has(.day-card[data-book]) {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
+        /* برای صفحات بزرگ، حداکثر ۲ ستون */
+        @media (min-width: 1200px) {
+            .days-container:has(.day-card[data-book]) {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
 
         .day-card {
             background-color: white;
@@ -389,9 +391,9 @@
             background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -410,10 +412,14 @@
 
         .time-period {
             margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color); /* خط جداکننده بین بازه‌های زمانی */
+            padding-bottom: 20px;
         }
 
         .time-period:last-child {
             margin-bottom: 0;
+            border-bottom: none;
+            padding-bottom: 0;
         }
 
         .time-period-title {
@@ -1184,6 +1190,49 @@
         .move-down-btn:hover {
             color: var(--accent-color) !important;
         }
+
+        /* === استایل‌های جدید برای انتخاب رنگ خروجی === */
+        .output-color-picker {
+            margin: 15px 0;
+        }
+
+        .output-color-picker-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .output-color-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .output-color-option {
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .output-color-option:hover {
+            transform: scale(1.05);
+        }
+
+        .output-color-option.selected {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -1292,12 +1341,14 @@
                                 <div class="custom-option" data-value="ریاضی">ریاضی و فیزیک</div>
                                 <div class="custom-option" data-value="انسانی">علوم انسانی</div>
                                 <div class="custom-option" data-value="فنی">فنی و حرفه‌ای</div>
-                                <div class="custom-option" data-value="هنر">هنر</div>
+<div class="custom-option" data-value="هنر">هنر</div>
+
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- بخش اطلاعات برنامه به عنوان یک کارت جداگانه -->
                 <div class="info-card">
                     <div class="info-card-title">
                         <span class="material-icons">calendar_today</span>
@@ -1313,7 +1364,7 @@
                     </div>
                     <div class="input-group">
                         <label for="reportDate">تاریخ برنامه‌ریزی</label>
-                        <input type="text" id="reportDate" placeholder="تاریخ امروز" dir="ltr" readonly>
+                        <input type="text" id="reportDate" placeholder="تاریخ امروز" dir="ltr">
                     </div>
                 </div>
             </div>
@@ -1462,6 +1513,15 @@
                     <h3>نام فایل را وارد کنید</h3>
                     <p>لطفاً نام دلخواه خود را برای فایل وارد نمایید</p>
                     <input type="text" class="file-name-input" id="fileNameInput" placeholder="نام فایل">
+                    
+                    <!-- بخش انتخاب رنگ خروجی -->
+                    <div class="output-color-picker">
+                        <label class="output-color-picker-label">انتخاب رنگ خروجی:</label>
+                        <div class="output-color-grid" id="outputColorGrid">
+                            <!-- رنگ‌ها با جاوااسکریپت اضافه می‌شوند -->
+                        </div>
+                    </div>
+                    
                     <div class="dialog-actions">
                         <button class="dialog-btn dialog-btn-primary" id="confirmFileName">تایید</button>
                         <button class="dialog-btn dialog-btn-secondary" id="cancelFileName">انصراف</button>
@@ -1529,6 +1589,7 @@
         let currentFileNameCallback = null;
         let currentCounselorType = 'standard'; // 'standard' یا 'alireza-torkamani'
         let selectedColor = '#3182ce'; // رنگ پیش‌فرض
+        let selectedOutputColor = '#667eea'; // رنگ پیش‌فرض خروجی
 
         // === رنگ‌های پیش‌فرض برای انتخاب ===
         const colorOptions = [
@@ -1542,6 +1603,77 @@
             '#4a5568', '#2d3748', '#1a202c'  // خاکستری
         ];
 
+        // === رنگ‌های پیش‌فرض برای خروجی ===
+        const outputColorOptions = [
+            { color: '#667eea', secondary: '#764ba2', name: 'بنفش' },
+            { color: '#3182ce', secondary: '#2c5282', name: 'آبی' },
+            { color: '#38a169', secondary: '#2f855a', name: 'سبز' },
+            { color: '#e53e3e', secondary: '#c53030', name: 'قرمز' },
+            { color: '#d145cb', secondary: '#ab2689', name: 'صورتی'},
+            { color: '#dd6b20', secondary: '#c05621', name: 'نارنجی' },
+            { color: '#319795', secondary: '#2c7a7b', name: 'فیروزه‌ای' },
+            { color: '#4a5568', secondary: '#2d3748', name: 'خاکستری' }
+        ];
+
+        // === رنگ‌بندی کتاب‌های دبیرستان ===
+        const subjectColors = {
+            'ریاضی': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'فیزیک': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'شیمی': { color: '#4caf50', secondary: '#388e3c', name: 'science' },
+            'زیست‌شناسی': { color: '#4caf50', secondary: '#388e3c', name: 'science' },
+            'علوم': { color: '#4caf50', secondary: '#388e3c', name: 'science' },
+            'زبان انگلیسی': { color: '#2196f3', secondary: '#1976d2', name: 'language' },
+            'زبان عربی': { color: '#00bcd4', secondary: '#0097a7', name: 'arabic' },
+            'فارسی': { color: '#9c27b0', secondary: '#7b1fa2', name: 'literature' },
+            'ادبیات': { color: '#9c27b0', secondary: '#7b1fa2', name: 'literature' },
+            'تاریخ': { color: '#ff9800', secondary: '#f57c00', name: 'history' },
+            'جغرافیا': { color: '#ff9800', secondary: '#f57c00', name: 'history' },
+            'فلسفه': { color: '#ff9800', secondary: '#f57c00', name: 'history' },
+            'دین و زندگی': { color: '#4caf50', secondary: '#388e3c', name: 'religion' },
+            'قرآن': { color: '#4caf50', secondary: '#388e3c', name: 'religion' },
+            'عربی': { color: '#00bcd4', secondary: '#0097a7', name: 'arabic' },
+            'اجتماعی': { color: '#ff9800', secondary: '#f57c00', name: 'history' },
+            'حسابان': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'هندسه': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'آمار و احتمال': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'آمار': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'حساب': { color: '#e91e63', secondary: '#c2185b', name: 'math' },
+            'مبانی برنامه‌نویسی': { color: '#3f51b5', secondary: '#303f9f', name: 'computer' },
+            'طراحی الگوریتم': { color: '#3f51b5', secondary: '#303f9f', name: 'computer' },
+            'معارف اسلامی': { color: '#4caf50', secondary: '#388e3c', name: 'religion' },
+            'روانشناسی': { color: '#9c27b0', secondary: '#7b1fa2', name: 'psychology' },
+            'جامعه‌شناسی': { color: '#ff9800', secondary: '#f57c00', name: 'sociology' },
+            'اقتصاد': { color: '#ff9800', secondary: '#f57c00', name: 'economics' },
+            'منطق': { color: '#ff9800', secondary: '#f57c00', name: 'logic' },
+            'هنر': { color: '#795548', secondary: '#5d4037', name: 'art' },
+            'ورزش': { color: '#795548', secondary: '#5d4037', name: 'sport' },
+            'کار و فناوری': { color: '#607d8b', secondary: '#455a64', name: 'technology' },
+            'برق': { color: '#607d8b', secondary: '#455a64', name: 'electricity' },
+            'الکتروتکنیک': { color: '#607d8b', secondary: '#455a64', name: 'electronics' },
+            'تعمیرات خودرو': { color: '#607d8b', secondary: '#455a64', name: 'automotive' },
+            'تجهیزات پزشکی': { color: '#607d8b', secondary: '#455a64', name: 'medical' },
+            'صنایع چوب': { color: '#607d8b', secondary: '#455a64', name: 'wood' },
+            'ساختمان': { color: '#607d8b', secondary: '#455a64', name: 'construction' },
+            'نقشه‌برداری': { color: '#607d8b', secondary: '#455a64', name: 'surveying' },
+            'نرم‌افزار': { color: '#3f51b5', secondary: '#303f9f', name: 'software' },
+            'سخت‌افزار': { color: '#3f51b5', secondary: '#303f9f', name: 'hardware' },
+            'شبکه': { color: '#3f51b5', secondary: '#303f9f', name: 'network' },
+            'امور اداری': { color: '#607d8b', secondary: '#455a64', name: 'administrative' },
+            'حسابداری': { color: '#607d8b', secondary: '#455a64', name: 'accounting' },
+            'بانکداری': { color: '#607d8b', secondary: '#455a64', name: 'banking' },
+            'بیمه': { color: '#607d8b', secondary: '#455a64', name: 'insurance' },
+            'بازرگانی': { color: '#607d8b', secondary: '#455a64', name: 'commerce' },
+            'گرافیک': { color: '#795548', secondary: '#5d4037', name: 'graphic' },
+            'عکاسی': { color: '#795548', secondary: '#5d4037', name: 'photography' },
+            'سینما': { color: '#795548', secondary: '#5d4037', name: 'cinema' },
+            'تئاتر': { color: '#795548', secondary: '#5d4037', name: 'theater' },
+            'موسیقی': { color: '#795548', secondary: '#5d4037', name: 'music' },
+            'مدیریت': { color: '#607d8b', secondary: '#455a64', name: 'management' },
+            'حقوق': { color: '#ff9800', secondary: '#f57c00', name: 'law' },
+            'سیاسی': { color: '#ff9800', secondary: '#f57c00', name: 'political' },
+            'بین‌الملل': { color: '#ff9800', secondary: '#f57c00', name: 'international' }
+        };
+
         // === توابع کمکی ===
         function getPersianDate() {
             try {
@@ -1554,6 +1686,12 @@
                 console.error("خطا در دریافت تاریخ شمسی:", e);
                 return new Date().toLocaleDateString('fa-IR');
             }
+        }
+
+        // تابع برای تبدیل اعداد انگلیسی به فارسی
+        function convertToPersianNumbers(str) {
+            const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+            return str.replace(/\d/g, (digit) => persianNumbers[digit]);
         }
 
         // === نمایش اعلان ===
@@ -1570,19 +1708,12 @@
 
         // === تولید HTML برای روز هفته (حالت استاندارد) ===
         function createDayCardHTML(dayName, dayIndex) {
-            const dayColors = [
-                '#1a365d', // شنبه
-                '#2c5282', // یکشنبه
-                '#3182ce', // دوشنبه
-                '#2b6cb0', // سه‌شنبه
-                '#2c5282', // چهارشنبه
-                '#2a4e7c', // پنج‌شنبه
-                '#1a365d'  // جمعه
-            ];
+            // استفاده از یک گرادینت ثابت برای تمام روزها
+            const dayGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
 
             return `
                 <div class="day-card" data-day="${dayName}">
-                    <div class="day-header" style="background-color: ${dayColors[dayIndex]};">
+                    <div class="day-header" style="background: ${dayGradient};">
                         ${dayName}
                     </div>
                     <div class="day-body">
@@ -1642,11 +1773,8 @@
 
         // === تولید HTML برای کتاب (حالت علیرضا ترکمانی) ===
         function createBookCardHTML(bookName, bookIndex, color = null) {
-            const bookColors = [
-                '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
-            ];
-            const colorIndex = bookIndex % bookColors.length;
-            const finalColor = color || bookColors[colorIndex];
+            // استفاده از رنگ انتخاب شده توسط کاربر بدون گرادینت
+            const finalColor = color || colorOptions[bookIndex % colorOptions.length];
 
             return `
                 <div class="day-card" data-book="${bookName}" data-color="${finalColor}">
@@ -1807,8 +1935,8 @@
             `;
         }
 
-        // === توابع مدیریت پارت‌های مطالعاتی ===
-        function addStudyPart(dayName, period) {
+                // === توابع مدیریت پارت‌های مطالعاتی ===
+                function addStudyPart(dayName, period) {
             const dayCard = document.querySelector(`.day-card[data-day="${dayName}"]`);
             const studyPartsContainer = dayCard.querySelector(`.study-parts[data-period="${period}"]`);
             studyPartsContainer.insertAdjacentHTML('beforeend', createStudyPartHTML());
@@ -2087,10 +2215,7 @@
 
         // تابع برای دریافت رنگ پیش‌فرض بر اساس ایندکس
         function getDefaultBookColor(index) {
-            const bookColors = [
-                '#1a365d', '#2c5282', '#3182ce', '#2b6cb0', '#2c5282', '#2a4e7c', '#1a365d'
-            ];
-            return bookColors[index % bookColors.length];
+            return colorOptions[index % colorOptions.length];
         }
 
         // === تابع برای تغییر نوع مشاور ===
@@ -2164,34 +2289,16 @@
         // === تولید محتوای HTML برای خروجی ===
         function generateHTMLContent() {
             const data = collectFormData();
+            const outputColor = outputColorOptions.find(opt => opt.color === selectedOutputColor) || outputColorOptions[0];
             
-            // رنگ‌بندی برای دروس
-            const subjectColors = {
-                'ریاضی': 'math',
-                'فیزیک': 'math',
-                'شیمی': 'science',
-                'زیست‌شناسی': 'science',
-                'علوم': 'science',
-                'زبان انگلیسی': 'language',
-                'زبان عربی': 'arabic',
-                'فارسی': 'literature',
-                'ادبیات': 'literature',
-                'تاریخ': 'history',
-                'جغرافیا': 'history',
-                'فلسفه': 'history',
-                'دین و زندگی': 'religion',
-                'قرآن': 'religion',
-                'عربی': 'arabic'
-            };
-
             // تابع برای تشخیص رنگ درس
             function getSubjectColor(bookName) {
-                for (const [subject, color] of Object.entries(subjectColors)) {
+                for (const [subject, colorData] of Object.entries(subjectColors)) {
                     if (bookName.includes(subject)) {
-                        return color;
+                        return colorData;
                     }
                 }
-                return 'math'; // رنگ پیش‌فرض
+                return { color: '#e91e63', secondary: '#c2185b', name: 'math' }; // رنگ پیش‌فرض
             }
 
             // تابع برای فرمت‌بندی متن مبحث (چندخطی)
@@ -2250,16 +2357,18 @@
                         margin: 0;
                         padding: 0;
                         line-height: 1.6;
+                        background-color: #f8f9fa;
                     }
                     .pdf-header {
-                        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+                        background: linear-gradient(135deg, ${outputColor.color} 0%, ${outputColor.secondary} 100%);
                         color: white;
                         padding: 40px;
                         text-align: center;
                         position: relative;
                         overflow: hidden;
-                        border-radius: 12px;
+                        border-radius: 0 0 30px 30px;
                         margin-bottom: 30px;
+                        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
                     }
                     .pdf-header::before {
                         content: '';
@@ -2309,11 +2418,11 @@
                         z-index: 1;
                     }
                     .pdf-info {
-                        background-color: #f0f7ff;
+                        background-color: white;
                         padding: 30px;
-                        margin-bottom: 30px;
-                        border-radius: 12px;
-                        border: 2px solid #e6f2ff;
+                        margin: 30px 20px;
+                        border-radius: 20px;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
                     }
                     .pdf-info-grid {
                         display: grid;
@@ -2323,12 +2432,33 @@
                     .pdf-info-item {
                         display: flex;
                         align-items: center;
-                        gap: 10px;
+                        gap: 15px;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 12px;
+                        border-right: 4px solid ${outputColor.color};
+                    }
+                    .pdf-info-icon {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-color: ${outputColor.color}15;
+                        color: ${outputColor.color};
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 20px;
+                        flex-shrink: 0;
+                    }
+                    .pdf-info-content {
+                        flex: 1;
                     }
                     .pdf-info-label {
                         font-weight: 700;
-                        color: #1a365d;
+                        color: ${outputColor.color};
                         min-width: 80px;
+                        display: block;
+                        margin-bottom: 5px;
                     }
                     .pdf-info-value {
                         color: #2d3748;
@@ -2336,13 +2466,13 @@
                     }
                     .pdf-schedule {
                         background-color: white;
-                        border-radius: 12px;
+                        border-radius: 20px;
                         overflow: hidden;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                        margin-bottom: 30px;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+                        margin: 30px 20px;
                     }
                     .pdf-schedule-header {
-                        background-color: #3182ce;
+                        background-color: ${outputColor.color};
                         color: white;
                         padding: 20px;
                         text-align: center;
@@ -2354,83 +2484,278 @@
                     .pdf-table {
                         width: 100%;
                         border-collapse: collapse;
+                        font-size: 14px;
+                        border-spacing: 0;
                     }
                     .pdf-table th {
-                        background-color: #2c5282;
+                        background-color: ${outputColor.color};
                         color: white;
                         padding: 15px;
                         text-align: center;
                         font-size: 16px;
                         font-weight: 600;
+                        /* تغییرات: ضخامت خطوط به 2px افزایش یافت */
+                        border-top: 1.5px solid #e6e6e6;
+                        border-right: 1.5px solid #e6e6e6;
+                        border-bottom: 1.5px solid #e6e6e6;
                     }
                     .pdf-table td {
-                        padding: 12px 15px;
+                        padding: 12px;
                         text-align: center;
-                        border-bottom: 1px solid #e2e8f0;
-                        font-size: 14px;
                         vertical-align: top;
+                        font-size: 14px;
+                        /* تغییرات: ضخامت خطوط به 2px افزایش یافت */
+                        border-right: 1.5px solid #e6e6e6;
+                        border-bottom: 1.5px solid #e6e6e6;
                     }
+                    /* === بخش اصلاح شده برای مدیریت خطوط جدول === */
+                    /* حذف خط سمت راست جدول (اولین سلول در حالت RTL) */
+                    .pdf-table th:first-child,
+                    .pdf-table td:first-child {
+                        border-right: none;
+                    }
+                    /* حذف خط سمت چپ جدول (آخرین سلول در حالت RTL) */
+                    .pdf-table th:last-child,
+                    .pdf-table td:last-child {
+                        border-left: none;
+                    }
+                    /* حذف خط پایانی جدول (آخرین ردیف) */
+                    .pdf-table tr:last-child td {
+                        border-bottom: none;
+                    }
+                    /* ================================================= */
+
                     .pdf-table tr:nth-child(even) {
-                        background-color: #f8fafc;
+                        background-color: #f8f9fa;
                     }
                     .pdf-day-cell, .pdf-book-cell {
-                        background-color: #edf2f7;
+                        background-color: ${outputColor.color};
+                        color: white;
                         font-weight: 600;
-                        color: #2d3748;
+                        font-size: 16px;
+                        text-align: center;
                     }
                     .pdf-subject {
-                        display: inline-block;
-                        padding: 6px 12px;
-                        border-radius: 20px;
-                        font-size: 12px;
+                        display: block;
+                        padding: 8px 12px;
+                        margin: 10px 0;
+                        border-radius: 8px;
+                        font-size: 13px;
                         font-weight: 500;
-                        margin: 2px;
                         white-space: pre-line;
                         text-align: center;
                     }
                     .pdf-subject-math {
-                        background-color: rgba(233, 30, 99, 0.15);
-                        color: #c2185b;
+                        background-color: rgba(33, 150, 243, 0.15);
+color: #1565c0;
+border: 1px solid rgba(33, 150, 243, 0.3);
                     }
                     .pdf-subject-science {
                         background-color: rgba(76, 175, 80, 0.15);
                         color: #388e3c;
+                        border: 1px solid rgba(76, 175, 80, 0.3);
                     }
                     .pdf-subject-language {
                         background-color: rgba(33, 150, 243, 0.15);
                         color: #1976d2;
+                        border: 1px solid rgba(33, 150, 243, 0.3);
                     }
                     .pdf-subject-history {
                         background-color: rgba(255, 152, 0, 0.15);
                         color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
                     }
                     .pdf-subject-literature {
                         background-color: rgba(156, 39, 176, 0.15);
                         color: #7b1fa2;
+                        border: 1px solid rgba(156, 39, 176, 0.3);
                     }
                     .pdf-subject-arabic {
                         background-color: rgba(0, 188, 212, 0.15);
                         color: #0097a7;
+                        border: 1px solid rgba(0, 188, 212, 0.3);
                     }
                     .pdf-subject-religion {
                         background-color: rgba(76, 175, 80, 0.15);
                         color: #388e3c;
+                        border: 1px solid rgba(76, 175, 80, 0.3);
+                    }
+                    .pdf-subject-computer {
+                        background-color: rgba(63, 81, 181, 0.15);
+                        color: #303f9f;
+                        border: 1px solid rgba(63, 81, 181, 0.3);
+                    }
+                    .pdf-subject-psychology {
+                        background-color: rgba(156, 39, 176, 0.15);
+                        color: #7b1fa2;
+                        border: 1px solid rgba(156, 39, 176, 0.3);
+                    }
+                    .pdf-subject-sociology {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
+                    }
+                    .pdf-subject-economics {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
+                    }
+                    .pdf-subject-logic {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
+                    }
+                    .pdf-subject-art {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-sport {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-technology {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-electricity {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-electronics {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-automotive {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-medical {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-wood {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-construction {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-surveying {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-software {
+                        background-color: rgba(63, 81, 181, 0.15);
+                        color: #303f9f;
+                        border: 1px solid rgba(63, 81, 181, 0.3);
+                    }
+                    .pdf-subject-hardware {
+                        background-color: rgba(63, 81, 181, 0.15);
+                        color: #303f9f;
+                        border: 1px solid rgba(63, 81, 181, 0.3);
+                    }
+                    .pdf-subject-network {
+                        background-color: rgba(63, 81, 181, 0.15);
+                        color: #303f9f;
+                        border: 1px solid rgba(63, 81, 181, 0.3);
+                    }
+                    .pdf-subject-administrative {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-accounting {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-banking {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-insurance {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-commerce {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-graphic {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-photography {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-cinema {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-theater {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-music {
+                        background-color: rgba(121, 85, 72, 0.15);
+                        color: #5d4037;
+                        border: 1px solid rgba(121, 85, 72, 0.3);
+                    }
+                    .pdf-subject-management {
+                        background-color: rgba(96, 125, 139, 0.15);
+                        color: #455a64;
+                        border: 1px solid rgba(96, 125, 139, 0.3);
+                    }
+                    .pdf-subject-law {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
+                    }
+                    .pdf-subject-political {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
+                    }
+                    .pdf-subject-international {
+                        background-color: rgba(255, 152, 0, 0.15);
+                        color: #f57c00;
+                        border: 1px solid rgba(255, 152, 0, 0.3);
                     }
                     .pdf-subject-empty {
                         color: #a0aec0;
                         font-style: italic;
+                        text-align: center;
                     }
                     .pdf-routine {
-                        background-color: #f0f7ff;
-                        border-radius: 12px;
+                        background-color: white;
+                        border-radius: 20px;
                         padding: 30px;
-                        margin-bottom: 30px;
-                        border: 2px solid #e6f2ff;
+                        margin: 30px 20px;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
                     }
                     .pdf-routine-title {
                         font-size: 24px;
                         font-weight: 700;
-                        color: #1a365d;
+                        color: ${outputColor.color};
                         margin-bottom: 20px;
                         text-align: center;
                     }
@@ -2442,27 +2767,47 @@
                     .pdf-routine-item {
                         display: flex;
                         align-items: center;
-                        gap: 10px;
+                        gap: 15px;
+                        padding: 15px;
+                        background-color: #f8f9fa;
+                        border-radius: 12px;
+                        border-right: 4px solid ${outputColor.color};
+                    }
+                    .pdf-routine-icon {
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-color: ${outputColor.color}15;
+                        color: ${outputColor.color};
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 20px;
+                        flex-shrink: 0;
+                    }
+                    .pdf-routine-content {
+                        flex: 1;
                     }
                     .pdf-routine-label {
                         font-weight: 600;
-                        color: #2c5282;
-                        min-width: 120px;
+                        color: ${outputColor.color};
+                        margin-bottom: 5px;
+                        display: block;
                     }
                     .pdf-routine-value {
                         color: #2d3748;
                     }
                     .pdf-notes {
-                        background-color: #f7fafc;
-                        border-radius: 12px;
+                        background-color: white;
+                        border-radius: 20px;
                         padding: 30px;
-                        margin-bottom: 30px;
-                        border: 1px solid #e2e8f0;
+                        margin: 30px 20px;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
                     }
                     .pdf-notes-title {
                         font-size: 20px;
                         font-weight: 700;
-                        color: #1a365d;
+                        color: ${outputColor.color};
                         margin-bottom: 20px;
                         text-align: center;
                     }
@@ -2472,14 +2817,14 @@
                         gap: 20px;
                     }
                     .pdf-note-item {
-                        background-color: white;
+                        background-color: #f8f9fa;
                         padding: 15px;
-                        border-radius: 8px;
-                        border-right: 4px solid #3182ce;
+                        border-radius: 12px;
+                        border-right: 4px solid ${outputColor.color};
                     }
                     .pdf-note-day, .pdf-note-book {
                         font-weight: 600;
-                        color: #1a365d;
+                        color: ${outputColor.color};
                         margin-bottom: 8px;
                     }
                     .pdf-note-content {
@@ -2488,11 +2833,13 @@
                         white-space: pre-line;
                     }
                     .pdf-footer {
-                        background-color: #1a365d;
+                        background: linear-gradient(135deg, ${outputColor.color} 0%, ${outputColor.secondary} 100%);
                         color: white;
                         padding: 20px;
                         text-align: center;
-                        border-radius: 12px;
+                        border-radius: 30px 30px 0 0;
+                        box-shadow: 0 -10px 30px rgba(102, 126, 234, 0.3);
+                        margin: 0;
                     }
                     .pdf-footer-text {
                         font-size: 14px;
@@ -2507,7 +2854,6 @@
                     }
                 </style>
             `;
-
             let scheduleTableHTML = '';
             
             if (data.counselorType === 'standard') {
@@ -2537,13 +2883,13 @@
                                             return '<span class="pdf-subject pdf-subject-empty">خالی</span>';
                                         }
                                         return parts.map(part => {
-                                            const colorClass = getSubjectColor(part.book);
+                                            const colorData = getSubjectColor(part.book);
                                             const formattedText = formatTopicText(part.book, part.topic, part.count, part.type);
                                             if (!formattedText) {
                                                 return '<span class="pdf-subject pdf-subject-empty">---</span>';
                                             }
-                                            return `<span class="pdf-subject pdf-subject-${colorClass}">${formattedText}</span>`;
-                                        }).join('<br>');
+                                            return `<span class="pdf-subject pdf-subject-${colorData.name}">${formattedText}</span>`;
+                                        }).join('');
                                     };
 
                                     return `
@@ -2574,7 +2920,7 @@
                                         <th>بازه زمانی</th>
                                         ${bookNames.map(bookName => {
                                             const bookColor = data.books[bookName]?.color;
-                                            return `<th ${bookColor ? `data-book-color="${bookColor}"` : ''}>${bookName}</th>`;
+                                            return `<th style="background-color: ${bookColor || outputColor.color};">${bookName}</th>`;
                                         }).join('')}
                                     </tr>
                                 </thead>
@@ -2597,9 +2943,10 @@
                                                     if (bookColor) {
                                                         return `<span class="pdf-subject" style="background-color: ${bookColor}15; color: ${bookColor}; border: 1px solid ${bookColor}30;">${formattedText}</span>`;
                                                     } else {
-                                                        return `<span class="pdf-subject pdf-subject-${getSubjectColor(bookName)}">${formattedText}</span>`;
+                                                        const colorData = getSubjectColor(bookName);
+                                                        return `<span class="pdf-subject pdf-subject-${colorData.name}">${formattedText}</span>`;
                                                     }
-                                                }).join('<br>');
+                                                }).join('');
                                             };
                                             return `<td>${renderParts(bookParts)}</td>`;
                                         }).join('')}
@@ -2618,6 +2965,7 @@
                     <meta charset="UTF-8">
                     <title>برنامه مطالعه - ${data.student.name || 'دانش‌آموز'}</title>
                     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
                     ${styles}
                 </head>
                 <body>
@@ -2626,7 +2974,7 @@
                         <div class="pdf-logo-container">
                             <img src="https://www.radianlearn.ir/wp-content/uploads/2023/10/20240324_231900-min.png" alt="لوگوی آکادمی رادیان" class="pdf-logo">
                         </div>
-                        <h1 class="pdf-title">برنامه ${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی مطالعه'}</h1>
+                        <h1 class="pdf-title">برنامه ${data.counselorType === 'alireza-torkamani' ? 'مطالعاتی' : 'هفتگی'}</h1>
                         <p class="pdf-subtitle">آکادمی تحصیلی رادیان</p>
                     </div>
 
@@ -2634,32 +2982,67 @@
                     <div class="pdf-info">
                         <div class="pdf-info-grid">
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">مشاور:</span>
-                                <span class="pdf-info-value">${data.counselor.name || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">person</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">مشاور:</span>
+                                    <span class="pdf-info-value">${data.counselor.name || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">شماره تماس:</span>
-                                <span class="pdf-info-value">${data.counselor.contact || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">phone</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">شماره تماس:</span>
+                                    <span class="pdf-info-value">${data.counselor.contact || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">دانش‌آموز:</span>
-                                <span class="pdf-info-value">${data.student.name || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">school</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">دانش‌آموز:</span>
+                                    <span class="pdf-info-value">${data.student.name || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">پایه تحصیلی:</span>
-                                <span class="pdf-info-value">${data.student.grade || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">grade</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">پایه تحصیلی:</span>
+                                    <span class="pdf-info-value">${data.student.grade || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">رشته تحصیلی:</span>
-                                <span class="pdf-info-value">${data.student.field || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">category</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">رشته تحصیلی:</span>
+                                    <span class="pdf-info-value">${data.student.field || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">${data.counselorType === 'alireza-torkamani' ? 'بازه زمانی:' : 'شماره هفته:'}</span>
-                                <span class="pdf-info-value">${data.counselorType === 'alireza-torkamani' ? (data.program.dateRange || '---') : (data.program.weekNumber || '---')}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">calendar_today</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">${data.counselorType === 'alireza-torkamani' ? 'بازه زمانی:' : 'شماره هفته:'}</span>
+                                    <span class="pdf-info-value">${data.counselorType === 'alireza-torkamani' ? (data.program.dateRange || '---') : (data.program.weekNumber || '---')}</span>
+                                </div>
                             </div>
                             <div class="pdf-info-item">
-                                <span class="pdf-info-label">تاریخ برنامه‌ریزی:</span>
-                                <span class="pdf-info-value">${data.program.date || '---'}</span>
+                                <div class="pdf-info-icon">
+                                    <span class="material-icons">event</span>
+                                </div>
+                                <div class="pdf-info-content">
+                                    <span class="pdf-info-label">تاریخ برنامه‌ریزی:</span>
+                                    <span class="pdf-info-value">${convertToPersianNumbers(data.program.date || '---')}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2671,17 +3054,27 @@
                         <h2 class="pdf-routine-title">روتین شبانه</h2>
                         <div class="pdf-routine-grid">
                             <div class="pdf-routine-item">
-                                <span class="pdf-routine-label">زمان خواب:</span>
-                                <span class="pdf-routine-value">${data.routine.sleepTime || '---'}</span>
+                                <div class="pdf-routine-icon">
+                                    <span class="material-icons">bedtime</span>
+                                </div>
+                                <div class="pdf-routine-content">
+                                    <span class="pdf-routine-label">زمان خواب:</span>
+                                    <span class="pdf-routine-value">${data.routine.sleepTime || '---'}</span>
+                                </div>
                             </div>
                             <div class="pdf-routine-item">
-                                <span class="pdf-routine-label">زمان بیداری:</span>
-                                <span class="pdf-routine-value">${data.routine.wakeTime || '---'}</span>
+                                <div class="pdf-routine-icon">
+                                    <span class="material-icons">wb_sunny</span>
+                                </div>
+                                <div class="pdf-routine-content">
+                                    <span class="pdf-routine-label">زمان بیداری:</span>
+                                    <span class="pdf-routine-value">${data.routine.wakeTime || '---'}</span>
+                                </div>
                             </div>
                         </div>
                         ${data.routine.description ? `
                             <div style="margin-top: 20px;">
-                                <div style="font-weight: 600; color: #2c5282; margin-bottom: 10px;">توضیحات کلی:</div>
+                                <div style="font-weight: 600; color: ${outputColor.color}; margin-bottom: 10px;">توضیحات کلی:</div>
                                 <div style="color: #4a5568; line-height: 1.6; white-space: pre-line;">${data.routine.description}</div>
                             </div>
                         ` : ''}
@@ -3221,6 +3614,16 @@
             const confirmBtn = document.getElementById('confirmFileName');
             const cancelBtn = document.getElementById('cancelFileName');
             const input = document.getElementById('fileNameInput');
+            const outputColorGrid = document.getElementById('outputColorGrid');
+            
+            // ایجاد شبکه رنگ‌های خروجی
+            outputColorGrid.innerHTML = outputColorOptions.map(opt => 
+                `<div class="output-color-option" style="background: linear-gradient(135deg, ${opt.color} 0%, ${opt.secondary} 100%);" data-color="${opt.color}" onclick="selectOutputColor('${opt.color}')">${opt.name}</div>`
+            ).join('');
+            
+            // انتخاب رنگ پیش‌فرض
+            selectedOutputColor = outputColorOptions[0].color;
+            document.querySelector(`.output-color-option[data-color="${selectedOutputColor}"]`).classList.add('selected');
             
             closeBtn.addEventListener('click', () => {
                 modal.classList.remove('active');
@@ -3256,6 +3659,15 @@
                     cancelBtn.click();
                 }
             });
+        }
+
+        // === تابع برای انتخاب رنگ خروجی ===
+        function selectOutputColor(color) {
+            selectedOutputColor = color;
+            document.querySelectorAll('.output-color-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelector(`.output-color-option[data-color="${color}"]`).classList.add('selected');
         }
 
         // === تنظیم دیالوگ افزودن کتاب ===
@@ -3536,6 +3948,10 @@
             const dateInput = document.getElementById('reportDate');
             if (dateInput) {
                 dateInput.value = getPersianDate();
+                // اضافه کردن رویداد برای فارسی‌سازی اعداد هنگام تایپ
+                dateInput.addEventListener('input', function() {
+                    this.value = convertToPersianNumbers(this.value);
+                });
             }
             
             // رندر برنامه اولیه
